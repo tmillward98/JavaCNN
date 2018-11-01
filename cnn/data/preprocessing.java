@@ -1,5 +1,10 @@
 package cnn.data;
 
-public class preprocessing {
+public class Preprocessing {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
 
 }
