@@ -1,8 +1,10 @@
 package cnn.data;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,25 +51,50 @@ public class ImageLoader {
 	 */
 	
 	ArrayList<BufferedImage> massLoad(String directory){
+		
+		/**
+		 * This sets the program to read the console output, and store it within a string.
+		 */
+		ByteArrayOutputStream consoleOutput = new ByteArrayOutputStream();
+		PrintStream reader = new PrintStream(consoleOutput);
+		PrintStream old = System.out;
+		System.setOut(reader);
+		
 		ArrayList<BufferedImage> loadedImages = new ArrayList<BufferedImage>();
 		
 		try(Stream<Path> paths = Files.walk(Paths.get(directory))) {
 			paths
 				.filter(Files::isRegularFile)
-				//.forEach(loadedImages.add());
-				//.forEach(loadedImages.add(loadImage()));
 				.forEach(System.out::println);
-				
+			
+			
 			
 		} catch (IOException e) {
 			
 		}
 		
+		System.out.flush();
+		System.setOut(old);
+		
+		String[] directories = consoleOutput.toString().split("\n");
+		
+		for(int x = 0; x < directories.length; x++) {
+			if(directories[x].contains(".jpg") == true) {
+				System.out.println("Image loaded: " + directories[x]);
+				loadedImages.add(loadImage(directories[x]));
+			}
+		}
 		
 		return loadedImages;
 	} 
-	
+}
+
+
+/**	
+	//TEST FUNCTIONS
 	public static void main(String[] args) {
+		
+		//MASS LOAD FUNCTIONALITY TEST
 		String test = "C:\\Users\\Tom\\Pictures";
 		ImageLoader loader = new ImageLoader();
 		loader.massLoad(test);
@@ -75,3 +102,4 @@ public class ImageLoader {
 	}
 	
 }
+**/
