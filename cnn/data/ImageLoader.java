@@ -37,7 +37,7 @@ public class ImageLoader {
 		try {
 			img = ImageIO.read(new File(directory + ".jpg"));
 		} catch (IOException e) {
-			
+			System.out.println("IO ERROR ON IMAGE LOAD");
 		}
 		
 		return img;
@@ -67,10 +67,8 @@ public class ImageLoader {
 				.filter(Files::isRegularFile)
 				.forEach(System.out::println);
 			
-			
-			
 		} catch (IOException e) {
-			
+			System.out.println("IO ERROR ON IMAGE LOAD");
 		}
 		
 		System.out.flush();

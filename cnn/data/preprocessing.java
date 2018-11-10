@@ -1,6 +1,7 @@
 package cnn.data;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 public class Preprocessing {
@@ -13,10 +14,7 @@ public class Preprocessing {
 	 * @return Array of RGBA values
 	 */
 	
-	private int[][][] channelSplitter(BufferedImage image) {
-		
-		int width = image.getWidth();
-		int height = image.getHeight();
+	private int[][][] channelSplitter(BufferedImage image, int height, int width) {
 		
 		//Declares array of size equal to the height and width for the image
 		int[][][] RGBAValues = new int[width][height][4];
@@ -32,6 +30,20 @@ public class Preprocessing {
 		}
 		
 		return RGBAValues;
+	}
+	
+	
+	/**
+	 * Used to resize any passed images to ensure they're uniform.
+	 * Makes use of fast scaling, as quality is less important than speed here
+	 * @param image - Image to be resized
+	 * @param h - New height
+	 * @param w - New width
+	 * @return
+	 */
+	private BufferedImage resizeImage(BufferedImage image, int h, int w) {
+		image.getScaledInstance(w, h, Image.SCALE_FAST);
+		return image;
 	}
 	
 	

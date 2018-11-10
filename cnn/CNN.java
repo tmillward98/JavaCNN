@@ -25,7 +25,7 @@ public class CNN {
 	private int layers;
 	private int seed;
 	
-	private ArrayList<Layer> networkLayers;
+	private ArrayList<Layer> networkLayers = new ArrayList<Layer>();
 	
 	//Null constructor
 	CNN(){
