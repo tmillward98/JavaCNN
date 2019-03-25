@@ -1,0 +1,48 @@
+package cnn.layers.neurons;
+
+import java.util.ArrayList;
+
+public class ClassNeuron extends Neuron {
+
+	int vectorLength;
+	String label;
+	double[] input;
+	double[] output;
+	double[] weights;
+	double rc = 0;
+	
+	
+	public double forward() {
+		return getScore()
+	}
+	
+	
+	/**
+	 * Class neuron which produces a score output that said image belongs to a class
+	 * @param l - class label
+	 * @param exampleInput - Denotes how long the vector of weights should be 
+	 */
+	public ClassNeuron(String l, double[] exampleInput) {
+		label = l;
+		weights = new double[exampleInput.length];
+		for (int i = 0; i < weights.length; i++) {
+			weights[i] = Math.random();
+		}
+	}
+	
+	private void logisticRegression() {
+		for(int i = 0; i < input.length; i++) {
+			output[i] = input[i] * weights[i];
+			rc += output[i];
+		}
+	}
+	
+	/**
+	 * Return calculated regression coefficient
+	 * @return
+	 */
+	public double getScore() {
+		return rc;
+	}
+	
+}

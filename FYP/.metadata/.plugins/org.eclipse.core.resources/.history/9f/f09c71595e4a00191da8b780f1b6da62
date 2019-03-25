@@ -1,0 +1,96 @@
+package cnn.layers;
+
+import java.util.ArrayList;
+
+import cnn.layers.neurons.ConvNeuron;
+
+/**
+ * Convolutional layer handles all things related to convolution neurons
+ * Each neuron should have its own kernel and generate a suitable output
+ * These outputs are stored within an ArrayList as output, and passed to the next layer
+ * @author Tom
+ *
+ */
+public class ConvolutionLayer extends Layer {
+
+	private int conD;
+	private int stride;
+	private int k;
+	private ArrayList<double[][]> input;
+	private ArrayList<double[][]> output;
+	private ArrayList<ConvNeuron> neurons;
+	private Layer previousLayer;
+	
+	/**
+	 * Retrieve previous layers output
+	 * Do calculations
+	 * Pass output forward
+	 */
+	public ArrayList<double[][]> forwardPropagate(){
+		input = previousLayer.forwardPropagate();
+		convolve();
+		return output;
+	}
+		
+	/**
+	 * Constructor
+	 * Hard-coded values for stride and conD (3x3 matrix with stride 1) with k feature kernels
+	 */
+	public ConvolutionLayer(){
+		neurons = new ArrayList<ConvNeuron>();
+		conD = 3;
+		stride = 1;
+		k = 1;
+		
+		for(int n = 0; n < k; n++) {
+			ConvNeuron a = new ConvNeuron(conD, stride);
+			neurons.add(a);
+		}	
+	}
+	
+	/**
+	 * Callable function for each layer
+	 * Whenever this function is called, assign the previous layer
+	 */
+	public void assignLayer(Layer prev) {
+		previousLayer = prev;
+	}
+	
+	/**
+	 * Perform convolution on each image with each neuron
+	 * eg. 1 images computes 4 feature masks
+	 */
+	private void convolve() {
+		if(input.get(0).length % conD != 0 || input.get(0)[0].length != 0) {
+			for(double[][] n : input)
+				n.equals(padImage(n));
+		}
+		
+		for(int i = 0; i < input.size(); i++) {
+			for(ConvNeuron n : neurons) {
+				output.add(n.convolveImage(input.get(i)));
+			}	
+		}
+	}
+		
+	/**
+	 * If convoluting the image would go out of bounds, instead pad image with 0 
+	 * @param channel
+	 * @return
+	 */
+	public double[][] padImage(double channel[][]) {
+			double[][] newArray = new double[channel.length + (channel.length % conD)][channel[0].length + (channel[0].length % conD)];
+			for(int i = 0; i < (channel.length + (channel.length % conD)); i++) {
+				for (int j = 0; j < (channel[0].length + (channel[0].length % conD)); j++) {
+					if(channel[i][j] != null) {
+						newArray[i][j] = channel[i][j];
+					}
+					newArray[i][j] = 0;
+				}
+			}	
+			System.arraycopy(channel, 0, newArray, 0, newArray.length);
+			return newArray;
+	}
+
+	
+}

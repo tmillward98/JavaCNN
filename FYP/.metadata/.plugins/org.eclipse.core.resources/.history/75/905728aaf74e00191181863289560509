@@ -1,0 +1,41 @@
+package cnn.layers.fclayers;
+
+import java.util.ArrayList;
+
+import cnn.layers.Layer;
+import cnn.layers.neurons.Neuron;
+
+public class FCClassifyLayer extends Layer{
+
+	private Layer previousLayer;
+	private Layer nextLayer;
+	private ArrayList<double[][]> output;
+	private ArrayList<Neuron> classNeurons;
+	private double[][] outputVector;
+	private int classes;
+	private double sum;
+	
+	public void assignLayer(Layer prev, Layer nl) {
+		previousLayer = prev; nextLayer = nl;
+	}
+	
+	public ArrayList<double[][]> forwardPropagate(){
+		return output;
+	}
+	
+	private double[][] softmax() {
+		for(int i = 0; i < classNeurons.size(); i++) {
+			outputVector[i][0] = classNeurons.get(i).forward();
+		}
+		
+		
+		
+		return outputVector;
+	}
+	
+	private void createNeurons() {
+		
+	}
+	
+	
+}

@@ -1,0 +1,21 @@
+package cnn.layers.neurons;
+
+//Used in fully connected layer
+//Takes an input from data, and forward propagates to next layer
+
+public class InputNeuron extends Neuron {
+
+	double input;
+	
+	public InputNeuron() {
+	}
+	
+	public double forward() {
+		return input;
+	}
+	
+	public void receiveInput(double a) {
+		input = a;
+	}
+	
+}

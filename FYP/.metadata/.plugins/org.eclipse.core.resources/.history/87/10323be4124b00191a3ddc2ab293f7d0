@@ -1,0 +1,18 @@
+package cnn.layers.neurons;
+import cnn.layers.Layer;
+
+public class SigmoidNeuron extends Neuron {
+
+	private Layer prevLayer;
+	private double[] inputs;
+	private double output;
+	private double[] weights;
+	
+	
+	public double forward() {
+		
+		
+		return 1;
+	}
+	
+}

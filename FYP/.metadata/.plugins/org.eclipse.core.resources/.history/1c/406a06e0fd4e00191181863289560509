@@ -1,0 +1,16 @@
+package cnn.layers.fclayers;
+import cnn.layers.neurons.*;
+
+import java.util.ArrayList;
+
+public class FCHiddenLayer extends FLayer {
+
+	private double[] output;
+	
+	//Hidden layer computes output, forward pass
+	ArrayList<SigmoidNeuron> neurons;
+	
+	public double[] forwardPass() {
+		return output;
+	}
+}

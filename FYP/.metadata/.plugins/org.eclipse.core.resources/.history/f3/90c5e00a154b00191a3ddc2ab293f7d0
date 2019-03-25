@@ -1,0 +1,27 @@
+package cnn.layers.neurons;
+import cnn.layers.Layer;
+
+public class SigmoidNeuron extends Neuron {
+
+	private double[] inputs;
+	private double output = 0;
+	private double[] weights;
+	
+	public SigmoidNeuron(double[] outputs) {
+		inputs = outputs;
+		weights = new double[inputs.length];
+		
+		for(int i = 0; i < inputs.length; i++) 
+			weights[i] = Math.random();
+	}
+	
+	
+	public double forward() {
+		for(int i = 0; i < inputs.length; i++) {
+			output += inputs[i] * weights[i];
+		}
+		
+		return 1;
+	}
+	
+}

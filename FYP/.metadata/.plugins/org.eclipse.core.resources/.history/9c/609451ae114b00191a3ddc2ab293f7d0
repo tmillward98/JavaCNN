@@ -1,0 +1,8 @@
+package cnn.layers.neurons;
+
+public abstract class Neuron {
+
+	public double forward()''
+	
+	
+}

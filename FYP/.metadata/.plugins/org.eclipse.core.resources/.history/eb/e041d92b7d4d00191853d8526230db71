@@ -1,0 +1,5 @@
+package cnn.layers.fclayers;
+
+public class FCHiddenLayer {
+
+}

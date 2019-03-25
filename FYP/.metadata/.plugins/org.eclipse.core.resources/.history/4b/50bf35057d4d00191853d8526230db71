@@ -1,0 +1,5 @@
+package cnn.layers;
+
+public class FCClassifyLayer {
+
+}

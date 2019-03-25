@@ -1,0 +1,20 @@
+package cnn.layers;
+
+import java.util.ArrayList;
+
+public class FCInputLayer extends Layer {
+
+	Layer previousLayer;
+	
+	@Override
+	public ArrayList<double[][]> forwardPropagate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void assignLayer(Layer prev) {
+		previousLayer = prev;
+
+	}
+
+}

@@ -1,0 +1,15 @@
+package cnn.layers.neurons;
+
+public class FCNeuron {
+	
+	//Weight and bias
+	float w1;
+	float b1;
+	
+	public FCNeuron(){
+		w1 = Math.random();
+		b1 = (int)
+	}
+	
+	
+}

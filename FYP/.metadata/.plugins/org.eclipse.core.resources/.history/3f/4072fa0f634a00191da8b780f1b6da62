@@ -1,0 +1,125 @@
+package cnn.layers;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import cnn.layers.neurons.ClassNeuron;
+import cnn.layers.neurons.FCNeuron;
+
+public class FCLayer extends Layer {
+
+	Layer previousLayer;
+	ArrayList<FCNeuron> layerNeurons;
+	ArrayList<ClassNeuron> classNeurons;
+	ArrayList<double[][]> input;
+	ArrayList<double[][]> output;
+	
+	private boolean neuronsCreated = false;
+	
+	double sc = 0;
+	double[] results;
+	
+	
+	/**
+	 * FC LAYER
+	 * FINAL LAYER SHOULD BE EQUAL TO NUMBER OF CLASSES WE WISH TO IDENTIFY (EG. EACH NEURON OUTPUTS PROBABILITY)
+	 * P(C|X)
+	 * 
+	 * FIRST LAYER TAKES INPUTS (IMAGE SIZE AFTER CONVOLUTION)
+	 * APPLY VECTOR OF WEIGHTS (EG. EACH NEURON HAS A WEIGHT)
+	 * 
+	 * 
+	 * OUTPUT SHOULD BE A C x 1 VECTOR WITH NORMALISED PROBABILITIES
+	 * 
+	 * Error can then be determined as sum of errors from vector
+	 * Hence, backpropogate and adjust weights
+	 * 
+	 * eg. output produces vector
+	 * Element wise value multiplication e^ci / sum of C values
+	 * 
+	 * Fully connected denotes the output of every neuron should go to every neuron in the next layer
+	 * 
+	 */
+	
+	public FCLayer() {
+		
+	}
+	
+	/**
+	 * Retrieve scores from each class neuron, normalise probabilities in the range of 0-1
+	 */
+	private void softmax() {
+		
+		for(int i = 0; i < results.length; i++) {
+			sc += classNeurons.get(i).getScore();
+			results[i] = Math.exp(classNeurons.get(i).getScore());
+		}
+		
+		for(double n : results) {
+			n = n / sc;
+		}
+		
+		
+	}
+	
+	/**
+	 * Number of neurons equal to the flattened volume of one instance of input
+	 */
+	private void createInputNeurons() {
+		
+		double[] temp = Arrays.stream(input.get(0))
+		        .flatMapToDouble(Arrays::stream)
+		        .toArray();
+		
+		for (int i = 0; i < temp.length; i++) {
+			FCNeuron a = new FCNeuron();
+			layerNeurons.add(a);
+		}
+	}
+
+	//Create number of neurons based on how many classes to derive
+	//Vector should have length equal to no. of classes
+	private void createClassNeurnons(String file) {
+		int classes; int counter = 0;
+		BufferedReader reader;
+		
+		try {
+			reader = new BufferedReader(new FileReader(file));
+			String line = reader.readLine();
+			classes = Integer.parseInt(line);
+			while(line != null) {
+				line = reader.readLine();
+				//ClassNeuron a = new ClassNeuron(classes, counter, line);
+			}
+		}
+		catch(IOException e) {
+			e.getStackTrace();
+		}
+		
+		
+	}
+	
+	public void assignLayer(Layer prev) {
+		previousLayer = prev;
+	}
+	
+	public ArrayList<double[][]> forwardPropagate(){
+		input = previousLayer.forwardPropagate();
+		
+		//Generate list of scored images, forward pass to determine error and begin back propagation
+		if(!neuronsCreated) {
+			createInputNeurons();
+			createClassNeurons("C:\Users\Tom\Desktop\test.txt");
+		}
+
+
+		
+		
+		return output;
+	}
+	
+}
+

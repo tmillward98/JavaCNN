@@ -1,0 +1,10 @@
+package cnn.layers.neurons;
+
+public abstract class FCNeuron {
+	
+	//Weight and bias
+	double w1;
+	double b1;
+	
+	
+}

@@ -1,0 +1,37 @@
+package cnn.layers;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+/**
+ * Receive input, flatten volume, pass to neurons
+ * @author Tom
+ *
+ */
+public class FCInputLayer extends Layer {
+
+	Layer previousLayer;
+	ArrayList<double[][]> input;
+	ArrayList<double[]> flatInputs;
+	
+	private void flattenInputs() {
+		
+		double[] temp = new double[input.get(0).length * input.get(0)[0].length;]
+		
+		Arrays.stream(input.get(0))
+        .flatMapToDouble(Arrays::stream)
+        .toArray();
+	}
+	
+	@Override
+	public ArrayList<double[][]> forwardPropagate() {
+		inputs = previousLayer.forwardPropagate();
+		return null;
+	}
+
+	public void assignLayer(Layer prev) {
+		previousLayer = prev;
+
+	}
+
+}

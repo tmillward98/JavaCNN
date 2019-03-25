@@ -1,0 +1,127 @@
+package cnn.layers;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import cnn.layers.neurons.ClassNeuron;
+import cnn.layers.neurons.FCNeuron;
+
+/**
+ * Layer which contains all information on the fully connected structure
+ * Makes use of arbitary functions previous provided
+ * Ultimately produces a classification vector
+ * @author Tom
+ *
+ */
+public class FCLayer extends Layer {
+
+	Layer previousLayer;
+	Layer nextLayer;
+	ArrayList<FCNeuron> layerNeurons;
+	ArrayList<ClassNeuron> classNeurons;
+	ArrayList<double[][]> input;
+	ArrayList<double[][]> output;
+	
+	double sc = 0;
+	double[] temp;
+	double[] results;
+	
+	/**
+	 * FC LAYER
+	 * FINAL LAYER SHOULD BE EQUAL TO NUMBER OF CLASSES WE WISH TO IDENTIFY (EG. EACH NEURON OUTPUTS PROBABILITY)
+	 * P(C|X)
+	 * 
+	 * FIRST LAYER TAKES INPUTS (NUMBER OF FEATURE MAPS)
+	 * APPLY VECTOR OF WEIGHTS (EG. EACH NEURON HAS A VECTOR OF WEIGHTS = SIZE OF INPUT)
+	 * WEIGHTS ARE INITIALISED AS RANDOM
+	 * 
+	 * EVERY OUTPUT OF EVERY NEURON IS THEN PASSED TO EVERY NEURON IN NEXT LAYER
+	 * WEIGHTS/BIAS APPLIED/ACTIVATION FUNCTIONS APPLIED
+	 * 
+	 * FINAL LAYER CLASSIFIES IMAGE BASED ON INPUTS (FEATURE MAPS THROUGH NEURONS)
+	 * THIS PRODUCES A PROBABILITY
+	 * 
+	 * OUTPUT SHOULD BE A C x 1 VECTOR WITH NORMALISED PROBABILITIES FROM ALL NEURONS (ALL CLASSES)
+	 * 
+	 * ERROR DETERMINED BY SUM OF ERROR FROM VECTORS
+	 * BACKPROPOGATE, ADJUST WEIGHTS
+	 * 
+	 * eg. output produces vector
+	 * Element wise value multiplication e^ci / sum of C values
+	 * 
+	 * Fully connected denotes the output of every neuron should go to every neuron in the next layer
+	 * 
+	 */
+	
+	public FCLayer() {
+		layerNeurons = new ArrayList<FCNeuron>();
+		classNeurons = new ArrayList<ClassNeuron>();
+	}
+	
+	public double[][] initaliseLayer(int c, double[][] sampleImage){
+		return sampleImage;
+	}
+	
+	
+	/**
+	 * Retrieve scores from each class neuron, normalise probabilities in the range of 0-1
+	 */
+	private void softmax() {	
+		for(int i = 0; i < results.length; i++) {
+			sc += classNeurons.get(i).forward();
+			results[i] = Math.exp(classNeurons.get(i).forward());
+		}
+		for(double n : results) 
+			n = n / sc;
+	}
+	
+	/**
+	 * Number of neurons equal to the flattened volume of one instance of input
+	 */
+	private void createInputNeurons() {
+		
+		temp = Arrays.stream(input.get(0))
+		        .flatMapToDouble(Arrays::stream)
+		        .toArray();
+		
+		for (int i = 0; i < temp.length; i++) {
+			FCNeuron a = new FCNeuron();
+			layerNeurons.add(a);
+		}
+	}
+
+	//Create number of neurons based on how many classes to derive
+	//Vector should have length equal to no. of classes
+	private void createClassNeurons(String file) {
+		int classes; int counter = 0;
+		BufferedReader reader;
+		
+		try {
+			reader = new BufferedReader(new FileReader(file));
+			String line = reader.readLine();
+			classes = Integer.parseInt(line);
+			while(line != null) {
+				line = reader.readLine();
+				ClassNeuron a = new ClassNeuron(line, temp);
+			}
+		}
+		catch(IOException e) {
+			e.getStackTrace();
+		}
+		
+		
+	}
+	
+	public void assignLayer(Layer prev, Layer nl) {
+		previousLayer = prev; nextLayer = nl;
+	}
+	
+	public ArrayList<double[][]> forwardPropagate(){
+		input = previousLayer.forwardPropagate();
+		return input;
+	}
+	
+}
+

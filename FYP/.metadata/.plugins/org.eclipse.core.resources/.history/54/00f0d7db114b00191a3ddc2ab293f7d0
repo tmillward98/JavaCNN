@@ -1,0 +1,9 @@
+package cnn.layers.neurons;
+
+public class SigmoidNeuron extends Neuron {
+
+	public double forward() {
+		return 1;
+	}
+	
+}

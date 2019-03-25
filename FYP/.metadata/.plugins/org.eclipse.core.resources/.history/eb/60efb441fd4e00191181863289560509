@@ -1,0 +1,10 @@
+package cnn.layers.fclayers;
+
+public abstract class FLayer {
+
+	FLayer previousLayer;
+	
+	public abstract ArrayList<Double> forwardPass();
+	//public abstract double backPropagate();
+	
+}
