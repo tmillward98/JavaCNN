@@ -1,9 +1,12 @@
 package cnn.layers.neurons;
 
 public abstract class Neuron {
-
+	
 	public abstract double forward();
 	
-	protected abstract void getInput();
+	public abstract void receiveInput(double[] inputs);
+	
+	public abstract void receiveInput(double input);
+	
 	
 }

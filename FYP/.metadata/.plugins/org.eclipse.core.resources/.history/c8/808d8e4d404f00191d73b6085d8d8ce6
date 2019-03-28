@@ -1,0 +1,66 @@
+package cnn.layers.fclayers;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import cnn.layers.Layer;
+import cnn.layers.neurons.InputNeuron;
+import cnn.layers.neurons.Neuron;
+
+/**
+ * Receive input, flatten volume, pass to neurons
+ * @author Tom
+ *
+ */
+public class FCInputLayer extends FLayer {
+
+	private Layer masterLayer;
+	private FLayer nextLayer;
+	double[] input;
+	double[] output;
+	ArrayList<double[]> flatInput;
+	double[] toPass;
+	ArrayList<Neuron> neurons;
+	
+	public FCInputLayer(double[] n){
+		flatInput = new ArrayList<double[]>();
+		neurons = new ArrayList<Neuron>();
+		createNeurons(n.length);
+	}
+	
+	public double[][] initaliseLayer(int c, double[][] sampleImage){
+		createNeurons(sampleImage.length * sampleImage[0].length);
+		return sampleImage;
+	}
+	
+	public double[] forwardPass() {
+		
+		return input;
+	}
+	
+	public double[] getOutput() {
+		return output;
+	}
+	
+	public double[] getInput() {
+		return input;
+	}
+	
+	/**
+	 * Arbitrary function
+	 * Assign previous layer, used for forward and backward propagation
+	 */
+	public void assignLayer(Layer prev, FLayer nl) {
+		masterLayer = prev; nextLayer = nl;
+	}
+	
+	/**
+	 * Initialise the number of neurons (equal to pixels of feature maps)
+	 * @param n - number to be created
+	 */
+	public void createNeurons(int n) {
+		for(int i = 0; i < n; i++) {
+			InputNeuron a = new InputNeuron();	
+			neurons.add(a);
+		}
+	}
+}

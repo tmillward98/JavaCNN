@@ -4,45 +4,45 @@ import cnn.layers.fclayers.FLayer;
 
 public class ClassNeuron extends Neuron {
 
-	private FLayer layer;
 	int vectorLength;
 	String label;
-	double[] input;
+	public double[] input;
 	double[] output;
 	double[] weights;
 	double rc = 0;
 	
-	
-	
-	public double forward() {
-		logisticRegression();
-		return rc;
+	public void receiveInput(double inputs) {
+		System.out.println("Error, should receive multiple inputs at class layer.");
 	}
 	
+	public void receiveInput(double[] inputs) {
+		input = inputs;
+	}
+	
+	public double forward() {
+		softmax();
+		return rc;
+	}
 	
 	/**
 	 * Class neuron which produces a score output that said image belongs to a class
 	 * @param l - class label
 	 * @param exampleInput - Denotes how long the vector of weights should be 
 	 */
-	public ClassNeuron(String l, double[] exampleInput, FLayer thisLayer) {
+	public ClassNeuron(String l, int n) {
 		label = l;
-		layer = thisLayer;
-		weights = new double[exampleInput.length];
+		weights = new double[n];
 		for (int i = 0; i < weights.length; i++) {
 			weights[i] = Math.random();
 		}
 	}
-	
-	private void logisticRegression() {
+
+	private void softmax() {
 		for(int i = 0; i < input.length; i++) {
-			output[i] = input[i] * weights[i];
-			rc += output[i];
+			input[i] = input[i] * weights[i];
+			rc += input[i];
 		}
 	}
 	
-	protected void getInput() {
-		input = layer.getInput();
-	}
 	
 }

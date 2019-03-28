@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import cnn.layers.Layer;
 import cnn.layers.neurons.InputNeuron;
+import cnn.layers.neurons.Neuron;
 
 /**
  * Receive input, flatten volume, pass to neurons
@@ -12,37 +13,32 @@ import cnn.layers.neurons.InputNeuron;
  */
 public class FCInputLayer extends FLayer {
 
-	private Layer masterLayer;
 	private FLayer nextLayer;
 	double[] input;
-	ArrayList<double[]> flatInput;
-	double[] toPass;
-	ArrayList<InputNeuron> neurons;
+	double[] output;
+	ArrayList<Neuron> neurons;
 	
-	FCInputLayer(){
-		flatInput = new ArrayList<double[]>();
-		neurons = new ArrayList<InputNeuron>();
+	public FCInputLayer(){
+		neurons = new ArrayList<Neuron>();
 	}
 	
-	public double[][] initaliseLayer(int c, double[][] sampleImage){
-		createNeurons(sampleImage.length * sampleImage[0].length);
-		return sampleImage;
+	public void initaliseLayer(int n, FLayer prev, FLayer next){
+		createNeurons(n);
+		nextLayer = next;
 	}
 	
-	public double[] forwardPass() {
-		return input;
+	public void receiveInput(double[] inputs) {
+		input = inputs;
 	}
 	
-	public double[] getInput() {
-		return input;
-	}
-	
-	/**
-	 * Arbitrary function
-	 * Assign previous layer, used for forward and backward propagation
-	 */
-	public void assignLayer(Layer prev, FLayer nl) {
-		masterLayer = prev; nextLayer = nl;
+	public void forwardPass() {
+		//do neuron stuff
+		for(int i = 0; i < neurons.size(); i++) {
+			neurons.get(i).receiveInput(input[i]);
+			output[i] = neurons.get(i).forward();
+		}
+		nextLayer.receiveInput(input);
+		nextLayer.forwardPass();
 	}
 	
 	/**
@@ -50,36 +46,9 @@ public class FCInputLayer extends FLayer {
 	 * @param n - number to be created
 	 */
 	public void createNeurons(int n) {
-		InputNeuron a = new InputNeuron(this);	
-		for(int i = 0; i < n; i++)
+		for(int i = 0; i < n; i++) {
+			InputNeuron a = new InputNeuron();	
 			neurons.add(a);
-	}
-
-	/**
-	 * Receive output from the previous layer, perform function, forward pass
-	 */
-	/**
-	@Override
-	public ArrayList<double[][]> forwardPropagate() {
-		//input = previousLayer.forwardPropagate();
-		//flattenInputs();
-		for(int i = 0; i < neurons.size(); i++) {
-			//neurons.get(i).receiveInput(flatInput[i]);
-		}
-		return null;
-	}
-*/
-	/**
-	 * Flatten the given input, ready for passing to neurons
-	 */
-	/**
-	private void flattenInputs() {			
-		for(int i = 0; i < input.size(); i++) {
-			flatInput.add(Arrays.stream(input.get(i))
-			        .flatMapToDouble(Arrays::stream)
-			        .toArray());
 		}
 	}
-	*/
-	
 }

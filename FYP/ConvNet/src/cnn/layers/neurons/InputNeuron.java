@@ -7,28 +7,28 @@ import cnn.layers.fclayers.FLayer;
 
 public class InputNeuron extends Neuron {
 
-	FLayer layer;
 	double w1;
 	double b1;
-	double[] input;
+	public double input;
 	
-	public InputNeuron(FLayer l) {
-		layer = l;
+	public InputNeuron() {
 		w1 = Math.random();
+		System.out.println(w1);
 		b1 = Math.random();
+		System.out.println(b1);
+	}
+	
+	public void receiveInput(double inputs) {
+		input = inputs;
+	}
+	
+	public void receiveInput(double[] inputs) {
+		System.out.println("Error, should only receive one input at input neuron.");
 	}
 	
 	public double forward() {
-		input[0] = (input[0] * w1) + b1;
-		return input[0];
-	}
-	
-	public void receiveInput(double a) {
-		input[0] = a;
-	}
-	
-	protected void getInput() {
-		input = layer.getInput();
+		input = (input * w1) + b1;
+		return input;
 	}
 	
 }

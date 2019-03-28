@@ -13,15 +13,13 @@ public class InputLayer extends Layer {
 	private ArrayList<double[][]> input;
 	private Layer nextLayer;
 	
-	public double[][] initaliseLayer(int c, double[][] sampleImage) {
-		//Do nothing....
-		return sampleImage;
+	public int getCount() {
+		return 1;
 	}
 	
-	//Do nothing, as, ya know, this is the first layer
-	public void assignLayer(Layer previousLayer, Layer nl) {
+	public ArrayList<double[][]> initialiseLayer(int c, ArrayList<double[][]> exampleInput, Layer nl, Layer pl) {
 		nextLayer = nl;
-		System.out.println("Reached Input Layer");
+		return exampleInput;
 	}
 	
 	public ArrayList<double[][]> forwardPropagate(){

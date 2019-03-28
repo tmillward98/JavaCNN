@@ -12,19 +12,22 @@ public class PoolLayer extends Layer{
 	private int poolD;
 	private int stride;
 	
-	public double[][] initaliseLayer(int c, double[][] sampleImage){
-		input = new ArrayList<double[][]>();
-		input.add(sampleImage);
-		maxPool();
-		sampleImage = input.get(0);
-		input = new ArrayList<double[][]>();
-		return sampleImage;
-	}
-	
 	public PoolLayer() {
 		poolD = 2;
 		stride = 2;
 		output = new ArrayList<double[][]>();
+	}
+	
+	public int getCount() {
+		return 1;
+	}
+	
+	public ArrayList<double[][]> initialiseLayer(int c, ArrayList<double[][]> exampleInput, Layer nl, Layer pl) {
+		nextLayer = nl;
+		previousLayer = pl;
+		input = exampleInput;
+		maxPool();
+		return output;
 	}
 	
 	public ArrayList<double[][]> forwardPropagate(){
@@ -33,13 +36,10 @@ public class PoolLayer extends Layer{
 		return output;
 	}
 	
-	public void assignLayer(Layer prev, Layer nl) {
-		previousLayer = prev; nextLayer = nl;
-	}
-	
 	private void maxPool() {
 		double[][] result = new double[((input.get(0).length - poolD) / stride) + 1][((input.get(0)[0].length - poolD) / stride) + 1];
 		double currentMax = 0;	
+		output = new ArrayList<double[][]>();
 		
 		for(double[][] n : input) {
 			for(int i = 0; i <= input.get(0).length - poolD; i+= stride) {

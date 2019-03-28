@@ -2,8 +2,7 @@ package cnn.layers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import cnn.layers.neurons.ClassNeuron;
-import cnn.layers.neurons.FCNeuron;
+import cnn.layers.fclayers.*;
 import java.util.stream.*;
 
 /**
@@ -15,17 +14,15 @@ import java.util.stream.*;
  */
 public class FCLayer extends Layer {
 
-	Layer previousLayer;
-	Layer nextLayer;
-	ArrayList<FCNeuron> layerNeurons;
-	ArrayList<ClassNeuron> classNeurons;
-	ArrayList<double[][]> input;
-	double[] flatInputs;
-	ArrayList<double[][]> output;
+	private Layer previousLayer;
+	private ArrayList<double[][]> input;
+	private double[] flatInputs;
+	private ArrayList<double[][]> output;
 	
-	double sc = 0;
-	double[] temp;
-	double[] results;
+	private ArrayList<FLayer> layers;
+	
+	private double sc = 0;
+	private double[] results;
 	
 	/**
 	 * FC LAYER
@@ -55,48 +52,44 @@ public class FCLayer extends Layer {
 	 */
 	
 	public FCLayer() {
-		layerNeurons = new ArrayList<FCNeuron>();
-		classNeurons = new ArrayList<ClassNeuron>();
 	}
 	
-	public double[][] initaliseLayer(int c, double[][] sampleImage){
-		//Create neurons based on how many inputs
-		input = new ArrayList<double[][]>();
-		input.add(sampleImage);
-		createInputNeurons();
-		input = new ArrayList<double[][]>();
-		return sampleImage;
+	public ArrayList<double[][]> initialiseLayer(int c, ArrayList<double[][]> exampleInput, Layer nl, Layer pl) {
+		previousLayer = pl;
+
+		//Create input neurons based on size of input
+		FCInputLayer a = new FCInputLayer();
+		
+		//Random sigmoid layer
+		FCHiddenLayer b = new FCHiddenLayer();
+		
+		
+		//Create class neurons based on how many classes there are
+		FCClassifyLayer d = new FCClassifyLayer();
+		
+		layers.add(a);
+		layers.add(b);
+		layers.add(d);	
+		
+		return exampleInput;
+	}
+	
+	public int getCount() {
+		return 1;
 	}
 	
 	/**
 	 * Retrieve scores from each class neuron, normalise probabilities in the range of 0-1
 	 */
 	private void softmax() {	
-		for(int i = 0; i < results.length; i++) {
-			sc += classNeurons.get(i).forward();
-			results[i] = Math.exp(classNeurons.get(i).forward());
-		}
+		//Get class layer output
+		
 		for(double n : results) 
 			n = n / sc;
 	}
 	
-	/**
-	 * Number of neurons equal to the flattened volume of one instance of input
-	 */
-	private void createInputNeurons() {
-		
-		temp = Arrays.stream(input.get(0))
-		        .flatMapToDouble(Arrays::stream)
-		        .toArray();
-		
-		for (int i = 0; i < temp.length; i++) {
-			FCNeuron a = new FCNeuron();
-			layerNeurons.add(a);
-		}
-	}
-	
 	public void assignLayer(Layer prev, Layer nl) {
-		previousLayer = prev; nextLayer = nl;
+		previousLayer = prev; 
 	}
 	
 	public ArrayList<double[][]> forwardPropagate(){

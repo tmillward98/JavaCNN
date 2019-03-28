@@ -19,9 +19,16 @@
 <fullyQualifiedTypeName name="java.nio.file.Paths"/>
 <fullyQualifiedTypeName name="java.io.FileInputStream"/>
 <fullyQualifiedTypeName name="java.awt.image.BufferedImage"/>
-<fullyQualifiedTypeName name="cnn.layers.Layer"/>
-<fullyQualifiedTypeName name="cnn.layers.neurons.InputNeuron"/>
-<fullyQualifiedTypeName name="java.util.ArrayList"/>
 <fullyQualifiedTypeName name="javafx.application.Application"/>
 <fullyQualifiedTypeName name="javafx.stage.Stage"/>
+<fullyQualifiedTypeName name="cnn.layers.Layer"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="java.lang.AbstractMethodError"/>
+<fullyQualifiedTypeName name="java.lang.Object"/>
+<fullyQualifiedTypeName name="javafx.scene.control.TextInputDialog"/>
+<fullyQualifiedTypeName name="cnn.layers.neurons.InputNeuron"/>
+<fullyQualifiedTypeName name="cnn.layers.fclayers.FLayer"/>
+<fullyQualifiedTypeName name="java.util.Random"/>
+<fullyQualifiedTypeName name="cnn.layers.neurons.Neuron"/>
+<fullyQualifiedTypeName name="java.lang.System"/>
 </qualifiedTypeNameHistroy>

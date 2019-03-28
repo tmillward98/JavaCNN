@@ -1,0 +1,15 @@
+package cnn.layers.fclayers;
+
+import java.util.ArrayList;
+
+public abstract class FLayer {
+	
+	public abstract double[] forwardPass();
+	
+	public abstract void initaliseLayer(int n);
+	
+	//public abstract double backPropagate();
+	
+	//public abstract void setInputs();
+	
+}

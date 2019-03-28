@@ -1,0 +1,25 @@
+package cnn.layers;
+
+import java.util.ArrayList;
+
+public class FCH extends Layer{
+	
+	private ArrayList<double[][]> input;
+	
+	public ArrayList<double[][]> forwardPropagate(){
+		//Apply neuron transformations
+		//return output
+		return input;
+	}
+
+	public ArrayList<double[][]> initialiseLayer(int c, ArrayList<double[][]> exampleInput, Layer nl, Layer pl) {
+		nextLayer = nl;
+		previousLayer = pl;
+		
+		input = exampleInput;
+		
+		
+		
+		return input;
+	}
+}

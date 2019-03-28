@@ -9,33 +9,31 @@ public class FCHiddenLayer extends FLayer {
 	private double[] input;
 	private double[] output;
 	
-	//Hidden layer computes output, forward pass
+	private FLayer previousLayer;
+	private FLayer nextLayer;
+	
 	ArrayList<Neuron> neurons;
 	
-	FCHiddenLayer(){
-		
-		Random randomnum = new Random();
-		int a = 1 + randomnum.nextInt(100);
-		output = new double[a];
-		
+	public void initaliseLayer(int n, FLayer prev, FLayer next){
+		previousLayer = prev;
+		nextLayer = next;
+		createNeurons(n);
+	}
+
+	public void receiveInput(double[] inputs) {
+		input = inputs;
 	}
 	
-	public double[] forwardPass() {
-		for(int i = 0; i < neurons.size(); i++) {
-			output[i] = neurons.get(i).forward();
-		}
-		return output;
+	public void forwardPass() {
+		//Do neuron stuff
+		nextLayer.receiveInput(input);
+		nextLayer.forwardPass();
 	}
 	
-	private void createNeurons() {
-		for (int i = 0; i < output.length; i++) {
-			SigmoidNeuron a = new SigmoidNeuron(output.length, this);
+	private void createNeurons(int n) {
+		for (int i = 0; i < n; i++) {
+			SigmoidNeuron a = new SigmoidNeuron(n);
 			neurons.add(a);
 		}
 	}
-	
-	public double[] getInput() {
-		return input;
-	}
-	
 }

@@ -1,0 +1,39 @@
+package cnn.layers.fclayers;
+import cnn.layers.neurons.*;
+
+import java.util.ArrayList;
+import java.util.Random;
+
+public class FCHiddenLayer extends FLayer {
+
+	private double[] input;
+	private double[] output;
+	
+	private FLayer previousLayer;
+	private FLayer nextLayer;
+	
+	//Hidden layer computes output, forward pass
+	ArrayList<Neuron> neurons;
+
+	
+	public void initaliseLayer(int n, FLayer prev, FLayer next){
+		previousLayer = prev;
+		nextLayer = next;
+		createNeurons(n);
+	}
+
+	public double[] forwardPass() {
+		for(int i = 0; i < neurons.size(); i++) {
+			output[i] = neurons.get(i).forward();
+		}
+		return output;
+	}
+	
+	private void createNeurons(int n) {
+		for (int i = 0; i < n; i++) {
+			SigmoidNeuron a = new SigmoidNeuron(this);
+			neurons.add(a);
+		}
+	}
+	
+}

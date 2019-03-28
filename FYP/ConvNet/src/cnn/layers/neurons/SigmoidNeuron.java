@@ -4,15 +4,23 @@ import cnn.layers.fclayers.FLayer;
 public class SigmoidNeuron extends Neuron {
 
 	private FLayer layer;
-	private double[] inputs;
+	private double[] input;
 	private double output = 0;
 	private double[] weights;
 	
-	public SigmoidNeuron(int length, FLayer thisLayer) {
-		layer = thisLayer;
-		weights = new double[length];
-		for(int i = 0; i < length; i++) 
+	public SigmoidNeuron(int n) {
+		weights = new double[n];
+		for(int i = 0; i < weights.length; i++) {
 			weights[i] = Math.random();
+		}
+	}
+	
+	public void receiveInput(double inputs) {
+		System.out.println("Error, supposed to receive multiple inputs");
+	}
+	
+	public void receiveInput(double[] inputs) {
+		input = inputs;
 	}
 	
 	/**
@@ -20,18 +28,14 @@ public class SigmoidNeuron extends Neuron {
 	 * Return new output
 	 */
 	public double forward() {
-		for(int i = 0; i < inputs.length; i++) {
-			output += inputs[i] * weights[i];
+		for(int i = 0; i < input.length; i++) {
+			output += input[i] * weights[i];
 		}
 		
 		//Sigmoidal activation
-		output = 1 / (1 + Math.exp(-output));
+		//output = 1 / (1 + Math.exp(-output));
 		
 		return output;
-	}
-	
-	public void getInput() {
-		inputs = layer.getInput();
 	}
 	
 }
