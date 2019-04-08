@@ -4,12 +4,24 @@ import java.util.ArrayList;
 
 public abstract class Layer {
 
+	protected double delta = 0;
 	protected Layer nextLayer;
 	protected Layer previousLayer;
+	protected ArrayList<double[][]> input;
+	protected ArrayList<double[][]> output;
 	
 	//Each layer should call the previous layer to forward propogate its results, and likewise work backs to backwards propogate the error
-	public abstract ArrayList<double[][]> forwardPropagate();
-	//public abstract backPropogate(double[][] error);
+	public abstract void forwardPropagate();
+	
+	public abstract void backwardPropagate(double delta, double lr);
+	
+	public ArrayList<double[][]> getOutput(){
+		return this.output;
+	}
+	
+	public void setInput(ArrayList<double[][]> inputs) {
+		this.input = inputs;
+	}
 	
 	public abstract ArrayList<double[][]> initialiseLayer(int c, ArrayList<double[][]> exampleInput, Layer nextLayer, Layer previousLayer);
 	

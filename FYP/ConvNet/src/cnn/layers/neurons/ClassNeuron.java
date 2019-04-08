@@ -1,7 +1,4 @@
 package cnn.layers.neurons;
-
-import cnn.layers.fclayers.FLayer;
-
 public class ClassNeuron extends Neuron {
 
 	int vectorLength;
@@ -18,6 +15,13 @@ public class ClassNeuron extends Neuron {
 	public void receiveInput(double[] inputs) {
 		input = inputs;
 	}
+	
+	public void updateWeights(double error, double lr) {
+		for(int i = 0; i < weights.length; i++) {
+			weights[i] = (error / rc) * lr;
+		}
+	}
+	
 	
 	public double forward() {
 		softmax();
@@ -38,6 +42,7 @@ public class ClassNeuron extends Neuron {
 	}
 
 	private void softmax() {
+		System.out.println(input.length);
 		for(int i = 0; i < input.length; i++) {
 			input[i] = input[i] * weights[i];
 			rc += input[i];

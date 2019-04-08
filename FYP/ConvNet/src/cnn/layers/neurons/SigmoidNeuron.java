@@ -1,9 +1,7 @@
 package cnn.layers.neurons;
-import cnn.layers.fclayers.FLayer;
 
 public class SigmoidNeuron extends Neuron {
 
-	private FLayer layer;
 	private double[] input;
 	private double output = 0;
 	private double[] weights;
@@ -23,6 +21,12 @@ public class SigmoidNeuron extends Neuron {
 		input = inputs;
 	}
 	
+	public void updateWeights(double error, double lr) {
+		for(int i = 0; i < weights.length; i++) {
+			weights[i] = (error / output) * lr;
+		}
+	}
+	
 	/**
 	 * Performs Sigmoidal activation function on its given inputs
 	 * Return new output
@@ -31,9 +35,7 @@ public class SigmoidNeuron extends Neuron {
 		for(int i = 0; i < input.length; i++) {
 			output += input[i] * weights[i];
 		}
-		
-		//Sigmoidal activation
-		//output = 1 / (1 + Math.exp(-output));
+		output = 1 / (1 + Math.exp(-output));
 		
 		return output;
 	}

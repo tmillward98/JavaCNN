@@ -23,8 +23,8 @@ public class FCH extends Layer{
 		neurons = new ArrayList<Neuron>();
 	}
 	
-	public ArrayList<double[][]> forwardPropagate(){
-		input = previousLayer.forwardPropagate();
+	public void forwardPropagate(){
+		output = new ArrayList<double[][]>();
 		flattenInputs();
 		
 		for(int i = 0; i < neurons.size(); i++) {
@@ -32,7 +32,14 @@ public class FCH extends Layer{
 			mapFlat[i][0] = neurons.get(i).forward();
 		}
 		output.add(mapFlat);
-		return output;
+		nextLayer.setInput(output);
+	}
+	
+	public void backwardPropagate(double delta, double lr) {
+		System.out.println("Reached hidden layer");
+		for(Neuron n : neurons)
+			n.updateWeights(delta, lr);
+		previousLayer.backwardPropagate(delta, lr);
 	}
 	
 	public int getCount() {

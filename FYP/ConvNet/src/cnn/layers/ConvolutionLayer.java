@@ -17,22 +17,26 @@ public class ConvolutionLayer extends Layer {
 	private int conD;
 	private int stride;
 	private int k;
-	private ArrayList<double[][]> input;
-	private ArrayList<double[][]> output;
+	//protected ArrayList<double[][]> input;
+	//protected ArrayList<double[][]> output;
 	private ArrayList<ConvNeuron> neurons;
-	private Layer previousLayer;
-	private Layer nextLayer;
 	
 	public int getCount() {
 		return k;
 	}
 	
 	public ArrayList<double[][]> initialiseLayer(int c, ArrayList<double[][]> exampleInput, Layer nl, Layer pl) {
+		input = new ArrayList<double[][]>();
 		nextLayer = nl;
 		previousLayer = pl;
 		input = exampleInput;
 		convolve();
-		return output;
+		return this.output;
+	}
+	
+	public void backwardPropagate(double delta, double lr) {
+		System.out.println("Reached conv layer");
+		previousLayer.backwardPropagate(delta, lr);
 	}
 	
 	/**
@@ -40,10 +44,9 @@ public class ConvolutionLayer extends Layer {
 	 * Do calculations
 	 * Pass output forward
 	 */
-	public ArrayList<double[][]> forwardPropagate(){
-		input = previousLayer.forwardPropagate();
+	public void forwardPropagate(){
 		convolve();
-		return output;
+		nextLayer.setInput(this.output);
 	}
 		
 	/**
@@ -51,6 +54,7 @@ public class ConvolutionLayer extends Layer {
 	 * Hard-coded values for stride and conD (3x3 matrix with stride 1) with k feature kernels
 	 */
 	public ConvolutionLayer(){
+		//input = new ArrayList<double[][]>();
 		output = new ArrayList<double[][]>();
 		neurons = new ArrayList<ConvNeuron>();
 		conD = 3;
@@ -79,7 +83,7 @@ public class ConvolutionLayer extends Layer {
 		
 		for(int i = 0; i < input.size(); i++) {
 			for(ConvNeuron n : neurons) {
-				output.add(n.convolveImage(input.get(i)));
+				this.output.add(n.convolveImage(this.input.get(i)));
 			}	
 		}
 	}
@@ -91,8 +95,8 @@ public class ConvolutionLayer extends Layer {
 	 */
 	public double[][] padImage(double channel[][]) {
 			double[][] newArray = new double[channel.length + (conD - (channel.length % conD))][channel[0].length + (conD - (channel[0].length % conD))];
-			for(int i = 0; i < (channel.length + (channel.length % conD)); i++) {
-				for (int j = 0; j < (channel[0].length + (channel[0].length % conD)); j++) {	
+			for(int i = 0; i < (channel.length + (conD - (channel.length % conD))); i++) {
+				for (int j = 0; j < (channel[0].length + (conD - (channel[0].length % conD))); j++) {	
 					newArray[i][j] = 0;
 				}
 			}	

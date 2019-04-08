@@ -30,10 +30,14 @@ public class PoolLayer extends Layer{
 		return output;
 	}
 	
-	public ArrayList<double[][]> forwardPropagate(){
-		input = previousLayer.forwardPropagate();
+	public void backwardPropagate(double delta, double lr) {
+		System.out.println("Reached pool layer");
+		previousLayer.backwardPropagate(delta, lr);
+	}
+	
+	public void forwardPropagate(){
 		maxPool();
-		return output;
+		nextLayer.setInput(output);
 	}
 	
 	private void maxPool() {

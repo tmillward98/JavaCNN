@@ -18,6 +18,7 @@ public class ConvNeuron {
 		b1 = 1;
 		
 		convMat = new double[covD][covD];	
+		
 		for(int i = 0; i < 3; i++) 
 			for(int j = 0; j < 3; j++) 
 				convMat[i][j] = Math.round(Math.random());

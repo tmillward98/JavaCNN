@@ -1,5 +1,7 @@
 package cnn.layers;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -11,19 +13,33 @@ import javax.imageio.ImageIO;
 public class InputLayer extends Layer {
 	
 	private ArrayList<double[][]> input;
-	private Layer nextLayer;
+	int counter = 0;
+	
+	public InputLayer(String dir) {
+		loadImages(dir);
+		counter = input.size();
+		output = input;
+	}
+	
+	public void backwardPropagate(double delta, double lr) {
+		System.out.println("Reached input layer");
+	}
 	
 	public int getCount() {
-		return 1;
+		return input.size();
 	}
 	
 	public ArrayList<double[][]> initialiseLayer(int c, ArrayList<double[][]> exampleInput, Layer nl, Layer pl) {
-		nextLayer = nl;
+		this.nextLayer = nl;
+		
 		return exampleInput;
 	}
 	
-	public ArrayList<double[][]> forwardPropagate(){
-		return input;
+	//Images need to be passed sequentially, not all at once
+	public void forwardPropagate(){
+		System.out.println("Reached");
+		System.out.println(input.size());
+		nextLayer.setInput(input);
 	}
 
 	public void loadImages(String directory) {
@@ -48,11 +64,12 @@ public class InputLayer extends Layer {
 	    
 	    ArrayList<BufferedImage> loadedImages = new ArrayList<BufferedImage>();
 	    BufferedImage img = null;
+
 	    
 	    for(final File f: dir.listFiles(IMAGE_FILTER)) {
 	    	try {
 	    		img = ImageIO.read(f);
-	    		loadedImages.add(img);
+				loadedImages.add(img);
 	    		
 	    	}
 	    	catch (IOException e) {
@@ -66,10 +83,11 @@ public class InputLayer extends Layer {
 		for(int i = 0; i < loadedImages.size(); i++) {	
 			for(int x = 0; x < loadedImages.get(0).getWidth(); x ++) {
 				for(int y = 0; y < loadedImages.get(0).getHeight(); y++) {
-					temp[x][y] = loadedImages.get(i).getRGB(x, y);
+					Color c = new Color(loadedImages.get(i).getRGB(x, y));
+					temp[x][y] = (c.getRed() + c.getBlue() + c.getGreen()) / 3;
 				}
 			}	
-			input.add(temp);
+			input.add(temp);	
 		}
 	}
 }

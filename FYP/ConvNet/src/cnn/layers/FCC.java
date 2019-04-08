@@ -12,13 +12,12 @@ public class FCC extends Layer {
 	protected Layer previousLayer;
 	private double[][] mapFlat;
 	private double[] flatInputs;
-	private ArrayList<double[][]> input;
-	private ArrayList<double[][]> output;
+	//private ArrayList<double[][]> input;
+	//private ArrayList<double[][]> output;
 	private ArrayList<Neuron> neurons;
 	
-	public ArrayList<double[][]> forwardPropagate(){
+	public void forwardPropagate(){
 		output = new ArrayList<double[][]>();
-		input = previousLayer.forwardPropagate();
 		flattenInputs();
 		
 		for(int i = 0; i < neurons.size(); i++) {
@@ -26,8 +25,13 @@ public class FCC extends Layer {
 			mapFlat[i][0] = neurons.get(i).forward();
 		}
 		output.add(mapFlat);
-		//return output
-		return output;
+	}
+	
+	public void backwardPropagate(double delta, double lr) {
+		System.out.println("Reached class layer");
+		for(Neuron n : neurons)
+			n.updateWeights(delta, lr);
+		previousLayer.backwardPropagate(delta, lr);
 	}
 
 	public ArrayList<double[][]> initialiseLayer(int c, ArrayList<double[][]> exampleInput, Layer nl, Layer pl) {

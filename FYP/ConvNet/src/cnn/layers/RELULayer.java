@@ -20,10 +20,18 @@ public class RELULayer extends Layer {
 		return 1;
 	}
 	
-	public ArrayList<double[][]> forwardPropagate(){
-		input = previousLayer.forwardPropagate();
+	public void setInput(ArrayList<double[][]> inputs) {
+		input = inputs;
+	}
+	
+	public void backwardPropagate(double delta, double lr) {
+		System.out.println("Reached ReLU layer");
+		previousLayer.backwardPropagate(delta, lr);
+	}
+	
+	public void forwardPropagate(){
 		LeakyRELU();
-		return input;
+		nextLayer.setInput(input);
 	}
 	
 	private void LeakyRELU() {

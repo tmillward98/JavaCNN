@@ -21,9 +21,8 @@ public class FCI extends Layer {
 	 * Do neuron stuff
 	 * Return ArrayList with double ArrayList with Array Mx1
 	 */
-	public ArrayList<double[][]> forwardPropagate(){
+	public void forwardPropagate(){
 		
-		input = previousLayer.forwardPropagate();
 		flattenInputs();
 		
 		output = new ArrayList<double[][]>();
@@ -33,7 +32,7 @@ public class FCI extends Layer {
 			mapFlat[i][0] = neurons.get(i).forward();
 		}
 		output.add(mapFlat);
-		return output;
+		nextLayer.setInput(output);
 	}
 
 	public ArrayList<double[][]> initialiseLayer(int c, ArrayList<double[][]> exampleInput, Layer nl, Layer pl) {
@@ -54,6 +53,13 @@ public class FCI extends Layer {
 		input.add(mapFlat);		
 		mapFlat = null;
 		return input;
+	}
+	
+	public void backwardPropagate(double delta, double lr) {
+		System.out.println("Reached FCI layer");
+		for(Neuron n : neurons)
+			n.updateWeights(delta, lr);
+		previousLayer.backwardPropagate(delta, lr);
 	}
 	
 	private void flattenInputs() {	
