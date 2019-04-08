@@ -5,6 +5,7 @@ public class SigmoidNeuron extends Neuron {
 	private double[] input;
 	private double output = 0;
 	private double[] weights;
+	private double b1 = 1;
 	
 	public SigmoidNeuron(int n) {
 		weights = new double[n];
@@ -22,8 +23,9 @@ public class SigmoidNeuron extends Neuron {
 	}
 	
 	public void updateWeights(double error, double lr) {
+		double change = b1 * error * lr; 
 		for(int i = 0; i < weights.length; i++) {
-			weights[i] = (error / output) * lr;
+			weights[i] = weights[i] + change;
 		}
 	}
 	

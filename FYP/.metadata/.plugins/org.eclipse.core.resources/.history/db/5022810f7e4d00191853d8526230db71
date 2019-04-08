@@ -1,7 +1,0 @@
-package cnn.layers.fclayers;
-
-public abstract class FLayer {
-
-	public double forwardPass();
-	
-}

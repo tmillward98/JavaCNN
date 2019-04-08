@@ -7,6 +7,7 @@ public class ClassNeuron extends Neuron {
 	double[] output;
 	double[] weights;
 	double rc = 0;
+	double b1 = 1;
 	
 	public void receiveInput(double inputs) {
 		System.out.println("Error, should receive multiple inputs at class layer.");
@@ -17,8 +18,9 @@ public class ClassNeuron extends Neuron {
 	}
 	
 	public void updateWeights(double error, double lr) {
+		double change = b1 * error * lr; 
 		for(int i = 0; i < weights.length; i++) {
-			weights[i] = (error / rc) * lr;
+			weights[i] = weights[i] + change;
 		}
 	}
 	

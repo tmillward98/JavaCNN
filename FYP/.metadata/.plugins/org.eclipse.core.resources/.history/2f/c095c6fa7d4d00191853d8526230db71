@@ -1,5 +1,0 @@
-package cnn.layers.fclayers;
-
-public abstract class FLayer {
-
-}

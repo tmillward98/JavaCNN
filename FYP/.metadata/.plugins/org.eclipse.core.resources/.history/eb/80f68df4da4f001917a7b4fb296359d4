@@ -1,7 +1,0 @@
-package cnn.layers;
-
-public class FCC extends Layer {
-
-	
-	
-}

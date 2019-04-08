@@ -19,7 +19,8 @@ public class InputNeuron extends Neuron {
 	}
 	
 	public void updateWeights(double error, double lr) {
-		w1 = error / output * lr;
+		double change = b1 * error * lr; 
+		w1 = w1 + change;
 	}
 	
 	public void receiveInput(double inputs) {

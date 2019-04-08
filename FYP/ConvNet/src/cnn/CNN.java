@@ -9,17 +9,35 @@ public class CNN {
 	private float learningRate;
 	private int epochs;
 	
-	private ArrayList<Pair<double[][], Integer>> trainingSet;
+	private ArrayList<Double> errors;
 	
+	private ArrayList<double[]> expectedOutputs;
+	private ArrayList<Pair<double[][], Integer>> trainingSet;
+	private static ArrayList<Layer> layers;
 	private static ArrayList<double[][]> output;
 	
-	CNN(float lr, int e){
+	CNN(float lr, int e, int c){
 		learningRate = lr;
 		epochs = e;
+		expectedOutputs = new ArrayList<double[]>();
+		genExpOutputs(c);
 	}
 	
-	private static ArrayList<Layer> layers;
-	
+	private void genExpOutputs(int c) {
+		double[] expOutputs = new double[c];
+		for(int i = 0; i < c; i++) {
+			for (int j = 0; j < expOutputs.length; j++) {
+				if(j != i) {
+					expOutputs[j] = 0;
+				}
+				else {
+					expOutputs[j] = 1;
+				}
+			}
+			expectedOutputs.add(expOutputs);
+		}
+	}
+		
 	/**
 	 * Once network structure has been created, initial parameters must be set
 	 * @param c - the number of classes
@@ -40,7 +58,6 @@ public class CNN {
 
 	
 	
-	
 	//Let's make a CNN
 	public static void main(String args[]) {
 		
@@ -48,7 +65,7 @@ public class CNN {
 		double[] expectedOutput = new double[] {1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		
 		
-		InputLayer a = new InputLayer("C:\\Users\\Tom\\Desktop\\Data\\New folder");
+		InputLayer a = new InputLayer("C:\\Users\\Tom\\Desktop\\New folder\\a");
 		ConvolutionLayer b = new ConvolutionLayer();
 		RELULayer c = new RELULayer();
 		PoolLayer d = new PoolLayer();
@@ -88,8 +105,6 @@ public class CNN {
 		
 		output = layers.get(layers.size() - 1).getOutput();
 		
-		//output = layers.get(layers.size()-1).getOutput();
-		
 		for(int i = 0; i < output.get(0).length; i++) {
 			rc += Math.exp(output.get(0)[i][0]);
 		}
@@ -103,6 +118,8 @@ public class CNN {
 		System.out.println("Loss: " + error);
 		
 		layers.get(layers.size() - 1).backwardPropagate(error, 0.05);
+		
+		error = 0;
 		
 		for(int i = 0; i < layers.size(); i++) {
 			layers.get(i).forwardPropagate();
