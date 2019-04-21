@@ -1,0 +1,73 @@
+package cnn.layers.neurons;
+
+import java.util.ArrayList;
+
+public abstract class Neuron {
+	
+	protected double[] input;
+	
+	protected double derivative;
+	
+	protected double output;
+	
+	protected double[] weights;
+	
+	protected double[] changeInWeights;
+	
+	protected ArrayList<Double> deltas;
+	
+	public abstract void updateWeights(ArrayList<Double> deltas, double lr);
+	
+	public abstract double forward();
+	
+	//This is just for the input neuron in the first layer such that we don't lose all of our input
+	public double[] inputForward() {
+		double[] out = new double[input.length];
+		
+		for(int i = 0; i < weights.length; i++) {
+			out[i] = input[i] * weights[i];
+		}
+		
+		return out;	
+	}
+	
+	
+	public abstract void receiveInput(double[] inputs);
+	
+	public abstract void receiveInput(double input);
+	
+	public double[] getInput() {
+		return input;
+	}
+	
+	public double getWeight(int index) {
+		return weights[index];
+	}
+	
+	public int numberOfWeights() {
+		return weights.length;
+	}
+	
+	//Calculate error with respect to each input (activation from last layer)
+	public void derivatives(double delta) {
+		for(int i = 0; i < input.length; i++) {
+			deltas.add(input[i] * delta);
+		}
+	}
+	
+	public double getDerivative() {
+		
+	}
+	
+	public double[] getWeights() {
+		return weights;
+	}
+
+	public double[] getDeltas() {
+		return changeInWeights;
+	}
+
+	public double getDelta(int index) {
+		return changeInWeights[index];
+	}
+}

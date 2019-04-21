@@ -1,0 +1,516 @@
+package cnn;
+
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
+import javax.imageio.ImageIO;
+
+import cnn.layers.*;
+import javafx.util.Pair;
+
+public class CNN {
+
+	private float learningRate;
+	private int epochs;
+	private int classes;
+	
+	private File dir;
+	private final String EXTENSIONS[] = new String[] {"jpg", "png", "bmp", "JPG"};
+	private FilenameFilter IMAGE_FILTER;
+	
+	
+	private double rc = 0;
+	private double networkCost = 0;
+	
+	private String[] directories;
+	
+	
+	private ArrayList<Double> errors;	
+	private ArrayList<double[]> expectedOutputs;
+	private ArrayList<Pair<String, Integer>> trainingBatch;
+	private ArrayList<Pair<String, Integer>> trainingSet;
+	private ArrayList<Pair<String, Integer>> validationSet;
+	private static ArrayList<Layer> layers;
+	private static ArrayList<double[][]> output;
+	private static ArrayList<Double> deltas;
+	
+	/**
+	 * 
+	 * @param lr - learning rate
+	 * @param e - epochs
+	 * @param c - number of classes
+	 * @param directory - image directory
+	 * @param classFile - class labels
+	 * @param structure - int structure
+	 */
+	CNN(float lr, int e, int c, String directory, String classFile, int[] structure){
+		output = new ArrayList<double[][]>();
+		learningRate = lr;
+		epochs = e;
+		classes = c;
+		
+		expectedOutputs = new ArrayList<double[]>();
+		genExpOutputs(c);
+		loadDirs(directory, classFile);
+		createNetwork(structure);
+		initialiseNetwork(c, loadImage(trainingSet.get(0).getKey()));
+		
+		deltas = new ArrayList<Double>();
+
+		for(int i = 0; i < c; i++) {
+			deltas.add(0.0);
+		}
+		
+	}
+	
+	/**
+	 * Loads images sequentially from their stored directory. 
+	 * Network learns using batch stochastic gradient descent, with a pre-determined batch size (currently 10%)
+	 */
+	public void trainNetwork() {
+		
+		BufferedImage a = null;
+		
+		try {
+			a = ImageIO.read(new File(trainingSet.get(0).getKey()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		ArrayList<double[][]> currentImage = new ArrayList<double[][]>();
+		
+		currentImage.add(convertImage(a));
+		
+		
+		for(int i = 0; i < epochs; i++) {
+			
+			System.out.println("EPOCH:" + i);
+			
+			createBatch(trainingSet.size() / 5);
+			
+			
+			for(int j = 0; j < trainingBatch.size(); j++) {
+				
+				try {
+					a = ImageIO.read(new File(trainingBatch.get(j).getKey()));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				currentImage.set(0, convertImage(a));
+				layers.get(0).setInput(currentImage);
+				
+				for(Layer l : layers) {
+					l.forwardPropagate();
+				}	
+				
+				output.clear();
+				
+				//output.equals(layers.get(layers.size()-1).getOutput());
+				output = layers.get(layers.size()-1).getOutput();
+				
+				/**
+				System.out.print("Output: ");
+				for(int x = 0; x < output.get(0).length; x++) {
+					System.out.print(output.get(0)[x][0] + " ");
+				}
+				System.out.println("Class: " + trainingBatch.get(j).getValue().intValue());
+				**/
+				
+				ArrayList<Double> tempDeltas = new ArrayList<Double>();
+				
+				tempDeltas = this.calcError(layers.get(layers.size()-1).getOutput(), expectedOutputs.get(trainingBatch.get(j).getValue().intValue()));
+				
+				//layers.get(layers.size()-1).backwardPropagate(tempDeltas, learningRate);
+				
+				for(int x = 0; x < deltas.size(); x++) {
+					deltas.set(x, deltas.get(x) + tempDeltas.get(x));
+					//System.out.println(deltas.get(x));
+				}
+				
+				
+				
+				
+			}
+			
+			//Average batch
+			for(int j = 0; j < deltas.size(); j++) {
+				deltas.set(j, deltas.get(j) / trainingBatch.size());
+				}
+			
+			layers.get(layers.size()-1).backwardPropagate(deltas, learningRate);
+			
+			deltas.clear();
+			
+			for(int j = 0; j < classes; j++) {
+				deltas.add(0.0);
+			}
+			System.out.println("Cost: " + networkCost);
+		}
+	}
+	
+	/**
+	 * Using a predetermined validation set (data the network has never seen before), the performance is evaluated
+	 */
+	public void validateNetwork() {
+		
+		int toGuess = validationSet.size();
+		int correctGuesses = 0;
+		
+		BufferedImage a = null;
+		
+		try {
+			a = ImageIO.read(new File(trainingSet.get(0).getKey()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		ArrayList<double[][]> currentImage = new ArrayList<double[][]>();
+		
+		currentImage.add(convertImage(a));
+		
+		
+		for(int i = 0; i < validationSet.size(); i++) {
+			
+			try {
+				a = ImageIO.read(new File(validationSet.get(i).getKey()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			currentImage.set(0, convertImage(a));
+			layers.get(0).setInput(currentImage);
+			
+			for(Layer l : layers) {
+				l.forwardPropagate();
+			}	
+			
+			output.clear();
+			
+			output = layers.get(layers.size()-1).getOutput();
+			
+			//Determine the predicted class, compare to the actual class
+			
+			double currentMax = 0; int currentIndex = 0;
+			
+			/**
+			deltas = this.calcError(output, expectedOutputs.get(validationSet.get(i).getValue().intValue()));
+			
+			for(int j = 0; j < deltas.size(); j++) {
+				if(deltas.get(j) > currentMax) {
+					currentMax = deltas.get(j);
+					currentIndex = j;
+				}
+			}
+			**/
+			
+			for(int j = 0; j < output.get(0).length; j++) {
+				if(output.get(0)[j][0] > currentMax) {
+					currentMax = output.get(0)[j][0];
+					currentIndex = j;
+				}
+			}
+			
+			System.out.print("Actual Class: " + validationSet.get(i).getValue().intValue());
+			System.out.println(" Predicted class: " + currentIndex);
+			
+			
+			if(currentIndex == validationSet.get(i).getValue().intValue()) {
+				correctGuesses++;
+			}
+			
+		}
+		if(correctGuesses != 0) {
+			System.out.println("Network is " + ((validationSet.size() / correctGuesses)) + "% correct when predicting using validation set.");
+		}
+		else {
+			System.out.println("Failed all tests.");
+		}
+
+	}
+	
+	private void genExpOutputs(int c) {
+		for(int i = 0; i < c; i++) {
+			double[] expOutputs = new double[c];
+			for (int j = 0; j < expOutputs.length; j++) {
+				if(i == j) {
+					expOutputs[i] = 1;
+				}
+				else {
+					expOutputs[j] = 0;
+				}
+			}
+			expectedOutputs.add(expOutputs);
+		}
+	}
+		
+	private void createBatch(int size) {
+		
+		trainingBatch = new ArrayList<Pair<String, Integer>>();
+		
+		for(int i = 0; i < size; i++) {
+			int randomIndex = (int) Math.round(Math.random() * (trainingSet.size() - 1));
+			
+			while(true) {
+				if(i > 0) {
+					if(trainingBatch.get(i - 1).getValue().intValue() == trainingSet.get(randomIndex).getValue().intValue()) {
+						randomIndex = (int) Math.round(Math.random() * (trainingSet.size() - 1));
+					}
+					else {
+						trainingBatch.add(trainingSet.get(randomIndex));
+						break;
+					}
+				}
+				else {
+					trainingBatch.add(trainingSet.get(randomIndex));
+					break;
+				}
+			}
+		}
+		
+		
+	}
+	
+	/**
+	 * Once network structure has been created, initial parameters must be set
+	 * @param c - the number of classes
+	 * @param sampleImage - Sample size of image, determines how many neurons are needed for the input layer of FC layer
+	 */
+	public void initialiseNetwork(int c, ArrayList<double[][]> sampleImage) {
+		ArrayList<double[][]> example = sampleImage;
+		
+		for(int i = 0; i < layers.size(); i ++) {
+			if(i == 0) {
+				example = layers.get(i).initialiseLayer(c, example, layers.get(i+1), null);
+			}
+			else if (i == layers.size()-1) {
+				example = layers.get(i).initialiseLayer(c, example, null, layers.get(i-1));
+			}
+			else {
+				example = layers.get(i).initialiseLayer(c, example, layers.get(i+1), layers.get(i-1));
+			}
+		}
+	}
+	
+	public ArrayList<Layer> returnStructure(){
+		return layers;
+	}
+	
+	private void createNetwork(int[] structure) {
+	
+		layers = new ArrayList<Layer>();
+		
+		Layer toAdd = new InputLayer();
+		layers.add(toAdd); 
+		
+		for(int n : structure) {
+			switch(n){
+				
+			case 0:
+				toAdd = new ConvolutionLayer();
+				break;
+				
+			case 1:
+				toAdd = new RELULayer();
+				break;
+				
+			case 2:
+				toAdd = new PoolLayer();
+				break;
+				
+			case 3:
+				toAdd = new FCI();
+				break;
+				
+			case 4:
+				toAdd = new FCH();
+				break;
+				
+			case 5:
+				toAdd = new HiddenReLU();
+			
+			}
+			layers.add(toAdd);
+		}
+		toAdd = new FCC();
+		layers.add(toAdd);		
+	}
+	
+	//H(p,q) = -sigma p(x) log q(x)
+	public static double crossEntropy(double p, double q) {
+		return (p * Math.log(q));
+	}
+
+	//Load and pass images one at a time to avoid overflow
+	private void loadDirs(String directory, String classFile) {
+		
+		trainingSet = new ArrayList<Pair<String, Integer>>();
+		validationSet = new ArrayList<Pair<String, Integer>>();
+		
+		dir = new File(directory);
+		
+	    IMAGE_FILTER = new FilenameFilter() {
+
+	        @Override
+	        public boolean accept(final File dir, final String name) {
+	            for (final String ext : EXTENSIONS) {
+	                if (name.endsWith("." + ext)) {
+	                    return (true);
+	                }
+	            }
+	            return (false);
+	        }
+	    };
+	    
+	    directories = Arrays.stream(dir.listFiles(IMAGE_FILTER)).map(File::getAbsolutePath).toArray(String[]::new);
+	    
+	    BufferedReader reader;
+	    int counter = 0;
+	    
+	    //Create Training Set
+	    try {
+	    	reader = new BufferedReader(new FileReader(classFile));
+	    	String line = reader.readLine();
+	    	while(line != null) {
+	    		Pair<String, Integer> toAdd = new Pair<>(directories[counter], Integer.parseInt(line));
+	    		line = reader.readLine(); counter++;
+	    		trainingSet.add(toAdd);
+	    	}
+	    }
+	    catch(IOException e) {
+	    	e.printStackTrace();
+	    }
+	    
+	    
+	    int validate = (int) Math.round(trainingSet.size() * 0.2);
+	    
+	    //Now take 20% of entries from the training set to be used as a validation set
+	    for(int i = 0; i < validate; i++) {	
+	    	int randomInt = (int) Math.round(Math.random() * trainingSet.size() - 1);
+	    	if(randomInt == -1) {
+	    		randomInt = 0;
+	    	}
+	    	
+	    	if(validationSet.size() != 0) {
+	    		while(true) {
+		    		if(trainingSet.get(randomInt).getValue().intValue() == validationSet.get(i - 1).getValue().intValue()) {
+		    			//System.out.println("Repeat value: " + trainingSet.get(randomInt).getValue().intValue()  + " | " + validationSet.get(i - 1).getValue().intValue());
+		    			randomInt = (int) Math.random() * trainingSet.size() - 1;
+		    			
+		    			if(randomInt == -1) {
+		    				randomInt = 0;
+		    			}
+		    			
+		    		}
+		    		else {
+		    			break;
+		    		}
+	    		}
+
+	    	}
+	    	
+	    	validationSet.add(trainingSet.get(randomInt));
+	    	trainingSet.remove(randomInt);
+	    }	    
+	}
+	
+	//Loads a single bufferedImage and returns converted ver
+	private ArrayList<double[][]> loadImage(String dir){
+		BufferedImage a = null;
+		
+		try {
+			a = ImageIO.read(new File(trainingSet.get(0).getKey()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		ArrayList<double[][]> img = new ArrayList<double[][]>();
+		img.add(convertImage(a));
+		
+		return img;
+	}
+	
+	//Convert images to pixel array
+	private double[][] convertImage(BufferedImage a){
+		double[][] temp = new double[a.getWidth()][a.getHeight()];	
+			for(int x = 0; x < a.getWidth(); x ++) {
+				for(int y = 0; y < a.getHeight(); y++) {
+					Color c = new Color(a.getRGB(x, y));
+					temp[x][y] = (c.getRed() + c.getBlue() + c.getGreen()) / 3;
+				}
+			}	
+			return temp;	
+		}
+	
+	public int testNetwork(String dir) {
+		
+		ArrayList<double[][]> toTest = loadImage(dir);
+		
+		layers.get(0).setInput(toTest);
+		
+		for(Layer a : layers) {
+			a.forwardPropagate();
+		}
+		
+		output = layers.get(layers.size()-1).getOutput(); 
+		
+		double currentMax = 0; int currentIndex = 0;
+		
+		currentMax = output.get(0)[0][0];
+		
+		for(int i = 0; i < output.get(0).length; i++) {
+			if(output.get(0)[i][0] > currentMax) {
+				currentMax = output.get(0)[i][0]; currentIndex = i;
+			}
+		}
+		
+		return currentIndex;
+	}
+	
+	//Used extensively for the output layer
+	//Calculates derivative of cross entropy given softmax, which equates to predicted - target
+	//This gives errors = no of classes = number of neurons in the last layer
+	private ArrayList<Double> calcError(ArrayList<double[][]> output, double[] expectedOutput) {
+		
+		ArrayList<Double> errors = new ArrayList<Double>();
+		networkCost = 0;
+		
+		for(int i = 0; i < output.get(0).length; i++) {
+			//System.out.println("Output: " + output.get(0)[i][0]);
+			errors.add(expectedOutput[i] - output.get(0)[i][0]);
+			//System.out.println("Error: " + errors.get(i));
+			networkCost += crossEntropy(expectedOutput[i], output.get(0)[i][0]);
+		}
+			
+		networkCost = -networkCost;
+		
+		//errors.add(networkCost);
+		//System.out.println("Cost: " + networkCost);
+		
+		return errors;
+	}
+	
+	public static void main(String[] args) {
+		
+		int[] newS = {0, 1, 2, 0, 1, 2, 3, 5, 5};
+		
+		CNN a = new CNN((float)0.1, 1000, 10, "E:\\University\\Year 3\\Final Year Project\\Dataset\\SmallDemoTrainingSet", "E:\\University\\Year 3\\Final Year Project\\Dataset\\SmallDemoTrainingSet\\class.txt", newS);
+		
+		a.trainNetwork();
+		a.validateNetwork();
+		
+		System.out.println("Predicted class: " + a.testNetwork("E:\\University\\Year 3\\Final Year Project\\Dataset\\DemoTrainingSet\\9(93).jpg"));
+		
+		
+	}
+	
+}

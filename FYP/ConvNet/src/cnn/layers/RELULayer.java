@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class RELULayer extends Layer {
 
-	private ArrayList<double[][]> input;
+	//private ArrayList<double[][]> input;
 	private Layer previousLayer;
 	private Layer nextLayer;
 	
@@ -24,8 +24,7 @@ public class RELULayer extends Layer {
 		input = inputs;
 	}
 	
-	public void backwardPropagate(double delta, double lr) {
-		System.out.println("Reached ReLU layer");
+	public void backwardPropagate(ArrayList<Double> delta, double lr) {
 		previousLayer.backwardPropagate(delta, lr);
 	}
 	

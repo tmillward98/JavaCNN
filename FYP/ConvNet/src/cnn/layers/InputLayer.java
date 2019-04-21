@@ -12,17 +12,12 @@ import javax.imageio.ImageIO;
 
 public class InputLayer extends Layer {
 	
-	private ArrayList<double[][]> input;
 	int counter = 0;
 	
-	public InputLayer(String dir) {
-		loadImages(dir);
-		counter = input.size();
-		output = input;
+	public InputLayer() {
 	}
 	
-	public void backwardPropagate(double delta, double lr) {
-		System.out.println("Reached input layer");
+	public void backwardPropagate(ArrayList<Double> delta, double lr) {
 	}
 	
 	public int getCount() {
@@ -37,8 +32,6 @@ public class InputLayer extends Layer {
 	
 	//Images need to be passed sequentially, not all at once
 	public void forwardPropagate(){
-		System.out.println("Reached");
-		System.out.println(input.size());
 		nextLayer.setInput(input);
 	}
 
@@ -64,6 +57,7 @@ public class InputLayer extends Layer {
 	    
 	    ArrayList<BufferedImage> loadedImages = new ArrayList<BufferedImage>();
 	    BufferedImage img = null;
+	    
 
 	    
 	    for(final File f: dir.listFiles(IMAGE_FILTER)) {

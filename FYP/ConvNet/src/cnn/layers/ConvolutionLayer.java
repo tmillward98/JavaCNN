@@ -34,8 +34,7 @@ public class ConvolutionLayer extends Layer {
 		return this.output;
 	}
 	
-	public void backwardPropagate(double delta, double lr) {
-		System.out.println("Reached conv layer");
+	public void backwardPropagate(ArrayList<Double> delta, double lr) {
 		previousLayer.backwardPropagate(delta, lr);
 	}
 	
@@ -59,7 +58,7 @@ public class ConvolutionLayer extends Layer {
 		neurons = new ArrayList<ConvNeuron>();
 		conD = 3;
 		stride = 1;
-		k = 10;
+		k = 4;
 		
 		for(int n = 0; n < k; n++) {
 			ConvNeuron a = new ConvNeuron(conD, stride);

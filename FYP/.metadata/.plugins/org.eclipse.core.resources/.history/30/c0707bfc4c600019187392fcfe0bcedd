@@ -1,0 +1,72 @@
+package cnn.layers.neurons;
+
+public class ReLUNeuron extends Neuron {
+
+	private double b1 = 1;
+	
+	public ReLUNeuron(int n) {
+		weights = new double[n];
+		changeInWeights = new double[weights.length];
+		for(int i = 0; i < weights.length; i++) {
+			changeInWeights[i] = 0;
+			weights[i] = Math.random();
+		}
+	}
+	
+	public void receiveInput(double inputs) {
+		System.out.println("Error, supposed to receive multiple inputs");
+	}
+	
+	public void receiveInput(double[] inputs) {
+		input = inputs;
+	}
+	
+	public void updateWeights(double delta, double lr) {
+		for(int i = 0; i < weights.length; i++) {
+			changeInWeights[i] = input[i] * delta * lr;
+			//System.out.print("Change: " + changeInWeights[i] + "|");
+			//System.out.print("Old weight value: " + weights[i] + "|");
+			weights[i] = weights[i] + changeInWeights[i];
+			//System.out.println("New weight value: " + weights[i]);
+		}
+	}
+	
+	
+	/**
+	 * Performs Sigmoidal activation function on its given inputs
+	 * Return new output
+	 */
+	public double forward() {
+		output = 0;
+		
+		for(int i = 0; i < input.length; i++) {
+			output += input[i] * weights[i];
+		}
+		
+		if(output < 0) {
+			output = 0;
+		}
+		
+		return output;
+	}
+	
+	public void calculateDerivative() {
+		if(output > 0) {
+			derivative = 1;
+		}
+		else {
+			derivative = 0;
+		}
+	}
+	
+	public double getDerivative() {
+		if(output > 0) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+	
+	
+}

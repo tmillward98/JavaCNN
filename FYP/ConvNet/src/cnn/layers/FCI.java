@@ -13,9 +13,9 @@ public class FCI extends Layer {
 	
 	private double[] flatInputs;
 	private double[][] mapFlat;
-	private ArrayList<double[][]> input;
-	private ArrayList<double[][]> output;
-	private ArrayList<Neuron> neurons;
+	//private ArrayList<double[][]> input;
+	//private ArrayList<double[][]> output;
+	//private ArrayList<Neuron> neurons;
 		
 	/**
 	 * Do neuron stuff
@@ -24,13 +24,23 @@ public class FCI extends Layer {
 	public void forwardPropagate(){
 		
 		flattenInputs();
+		input.clear();
 		
 		output = new ArrayList<double[][]>();
 		
+		/**
 		for(int i = 0; i < neurons.size(); i++) {
-			neurons.get(i).receiveInput(flatInputs[i]);
-			mapFlat[i][0] = neurons.get(i).forward();
+			neurons.get(i).receiveInput(flatInputs);
+			flatInputs = neurons.get(i).inputForward();
 		}
+		**/
+		
+		for(int i = 0; i < flatInputs.length; i++) {
+			mapFlat[i][0] = flatInputs[i] / 10000;
+			//System.out.println(mapFlat[i][0]);
+		}
+		
+		input.add(mapFlat);	
 		output.add(mapFlat);
 		nextLayer.setInput(output);
 	}
@@ -41,9 +51,9 @@ public class FCI extends Layer {
 		
 		input = exampleInput;
 		flattenInputs();
-		neurons = new ArrayList<Neuron>();
-		createNeurons(flatInputs.length);
 		
+		neurons = new ArrayList<Neuron>();
+		createNeurons(1);
 		input = new ArrayList<double[][]>();
 		
 		for(int i = 0; i < flatInputs.length; i++) {
@@ -55,12 +65,10 @@ public class FCI extends Layer {
 		return input;
 	}
 	
-	public void backwardPropagate(double delta, double lr) {
-		System.out.println("Reached FCI layer");
-		for(Neuron n : neurons)
-			n.updateWeights(delta, lr);
-		previousLayer.backwardPropagate(delta, lr);
+	public void backwardPropagate(ArrayList<Double> delta, double lr) {
+		previousLayer.backwardPropagate(deltas, lr);
 	}
+
 	
 	private void flattenInputs() {	
 		ArrayList<double[]> flatInput = new ArrayList<double[]>();
@@ -80,11 +88,9 @@ public class FCI extends Layer {
 	}
 	
 	public void createNeurons(int n) {
-		for(int i = 0; i < n; i++) {
-			InputNeuron a = new InputNeuron();	
+			InputNeuron a = new InputNeuron(flatInputs.length);	
 			neurons.add(a);
 		}
-	}
 	
 	public int getCount() {
 		return neurons.size();

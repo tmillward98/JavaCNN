@@ -1,0 +1,15 @@
+package cnn.gui;
+
+import javax.swing.JFrame;
+
+public class ConvButton extends JFrame {
+
+	public ConvButton() {
+		
+	}
+	
+	public static void main(String[] args) {
+		
+	}
+	
+}

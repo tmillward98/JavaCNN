@@ -1,0 +1,28 @@
+package cnn.gui;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
+public class LayerButtons extends JFrame {
+
+	private JButton convButton, reLUButton, poolButton;
+	
+	public LayerButtons() {
+		createView();
+	}
+	
+	private void createView() {
+		JPanel panel = new JPanel();
+	}
+	
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new LayerButtons();
+			}
+		});
+	}
+	
+}

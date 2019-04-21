@@ -3,58 +3,174 @@ package cnn;
 import javax.swing.*;
 
 import javafx.application.Application;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.event.*;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
-public class GUI extends Application {
+public class GUI extends JFrame {
 	
-	float lr;
-	int epochs;
-	int c;
+	//Network Variables
+	static ArrayList<CNN> networks;
+	static ArrayList<Integer> NetworkStructure;
+	static ArrayList<Integer> FCStructure;
+	float lr; int epochs; int c;
 	
-	@Override
-	public void start(Stage stage) {
+	private JMenuBar menu;
+	private JMenu file, help;
+	
+	private JButton convButton, reLUButton, poolButton, hiddenLayer;
+	private JTextArea textArea;
+	
+	public GUI() {
+		NetworkStructure = new ArrayList<Integer>();
+		FCStructure = new ArrayList<Integer>();
 		
+		setSize(800,800);
+		createView();	
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
+		setResizable(false);
+
 	}
 	
-	 public static void main(String args[]) {
-		 
-		 //
-		 JFrame frame  = new JFrame("Convolutional Neural Network");
-		 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	     frame.setSize(800, 600);
-	     
-	     //Creating the MenuBar and adding components
-	     JMenuBar mb = new JMenuBar();
-	     JMenu m1 = new JMenu("File");
-	     JMenu m2 = new JMenu("Help");
-	     mb.add(m1);
-	     mb.add(m2);
-	     JMenuItem m11 = new JMenuItem("Settings");
-	     JMenuItem m22 = new JMenuItem("Save as");
+	private void createView() {
+		JPanel panel = new JPanel();
+		getContentPane().add(panel);
+		
+		menu = new JMenuBar();
+		menu.setSize(new Dimension(800, 100));
+		file = new JMenu("File");
+		help = new JMenu("Help");
+		menu.add(file);
+		menu.add(help);
+		
+		textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setLineWrap(true);
+		textArea.setWrapStyleWord(true);
+		textArea.setPreferredSize(new Dimension(800,400));
+		
+		
+		convButton = new JButton("Add Convolution Layer");
+		convButton.addActionListener(new ConvButtonActionListener());
+		
+		reLUButton = new JButton("Add ReLU Layer");
+		reLUButton.addActionListener(new ReLUButtonActionListener());
+		
+		poolButton = new JButton("Add Pooling Layer");
+		poolButton.addActionListener(new PoolButtonActionListener());
+		
+		hiddenLayer = new JButton("Add Hidden Layer");
+		hiddenLayer.addActionListener(new HiddenLayerActionListener());
+		
+		panel.add(menu);
+		panel.add(textArea);
+		panel.add(convButton);
+		panel.add(reLUButton);
+		panel.add(poolButton);
+		panel.add(hiddenLayer);
 
 
-	     TextInputDialog td = new TextInputDialog("Enter Epochs");
-	     EventHandler<ActionEvent> event = new EventHandler<ActionEvent>() { 
-	            public void handle(ActionEvent e) 
-	            { 
-	                // show the text input dialog 
-	                td.show(); 
-	            } 
-	        }; 
-	        
-	        
-		     m1.add(m11);
-		     m1.add(m22);
-	     
-	     //Adding Components to the frame.
-	     frame.getContentPane().add(BorderLayout.NORTH, mb);
-	     frame.setVisible(true);
-
-	 }
+	}
 	
+	private void addHidden() {
+		FCStructure.add(4);
+	}
+	
+	private void addConv() {
+		NetworkStructure.add(1);
+	}
+	
+	private void addReLU() {
+		NetworkStructure.add(2);
+	}
+	
+	private void addPool() {
+		NetworkStructure.add(3);
+	}
+	
+	//Called whenever a layer is added to update GUI
+	private void updateView() {
+		
+		textArea.setText("");
+		textArea.append("Input ->");
+		
+		for(int n : NetworkStructure) {
+			switch(n) {
+			
+			case 1:
+				textArea.append("Conv ->");
+				break;
+			
+			case 2:
+				textArea.append("Relu ->");
+				break;
+			
+			case 3:
+				textArea.append("Pool ->");
+				break;
+			
+			}
+		}
+		
+		textArea.append("FC Input ->");
+		
+		
+		for(int n : FCStructure) {
+			switch(n) {
+			case 4:
+				textArea.append("Hidden Layer ->");
+				break;
+			}
+		}
+		
+		textArea.append("Output Layer");
+	}
+	
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new GUI().setVisible(true);
+			}
+		});
+	}
+	
+	private class ConvButtonActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			addConv();
+			updateView();
+		}
+	}
+	
+	private class ReLUButtonActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			addReLU();
+			updateView();
+		}
+	}
+	
+	private class PoolButtonActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			addPool();
+			updateView();
+		}
+	}
+	
+	private class HiddenLayerActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			addHidden();
+			updateView();
+		}
+	}
 	
 }

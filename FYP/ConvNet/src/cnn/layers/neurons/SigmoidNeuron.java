@@ -1,15 +1,16 @@
-package cnn.layers.neurons;
+ package cnn.layers.neurons;
+
+import java.util.ArrayList;
 
 public class SigmoidNeuron extends Neuron {
 
-	private double[] input;
-	private double output = 0;
-	private double[] weights;
-	private double b1 = 1;
+	private double b1 = 0;
 	
 	public SigmoidNeuron(int n) {
 		weights = new double[n];
+		changeInWeights = new double[weights.length];
 		for(int i = 0; i < weights.length; i++) {
+			changeInWeights[i] = 0;
 			weights[i] = Math.random();
 		}
 	}
@@ -22,24 +23,34 @@ public class SigmoidNeuron extends Neuron {
 		input = inputs;
 	}
 	
-	public void updateWeights(double error, double lr) {
-		double change = b1 * error * lr; 
+	public void updateWeights(double delta, double lr) {
 		for(int i = 0; i < weights.length; i++) {
-			weights[i] = weights[i] + change;
+			changeInWeights[i] = input[i] * delta * lr;
+			//System.out.print("Change: " + changeInWeights[i] + "|");
+			//System.out.print("Old weight value: " + weights[i] + "|");
+			weights[i] = weights[i] + changeInWeights[i];
+			//System.out.println("New weight value: " + weights[i]);
 		}
 	}
+	
 	
 	/**
 	 * Performs Sigmoidal activation function on its given inputs
 	 * Return new output
 	 */
 	public double forward() {
+		output = 0;
+		
 		for(int i = 0; i < input.length; i++) {
 			output += input[i] * weights[i];
 		}
 		output = 1 / (1 + Math.exp(-output));
 		
 		return output;
+	}
+
+	public double getDerivative() {
+		return output * (1.0 - output);
 	}
 	
 }

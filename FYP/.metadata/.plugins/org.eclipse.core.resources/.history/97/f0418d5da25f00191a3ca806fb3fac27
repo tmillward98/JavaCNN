@@ -1,0 +1,86 @@
+package cnn;
+
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import javax.swing.JButton;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.SwingConstants;
+import java.awt.GridLayout;
+
+public class UserInterface {
+
+	private JFrame frame;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					UserInterface window = new UserInterface();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public UserInterface() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 1280, 720);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
+		
+		JPanel panel = new JPanel();
+		frame.getContentPane().add(panel);
+		
+		JButton btnAddConvolutionalButton = new JButton("Add Convolutional Layer");
+		btnAddConvolutionalButton.setVerticalAlignment(SwingConstants.BOTTOM);
+		btnAddConvolutionalButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		panel.add(btnAddConvolutionalButton);
+		
+		JButton btnAddReluLayer = new JButton("Add ReLU Layer");
+		panel.add(btnAddReluLayer);
+		
+		JButton btnAddPoolingLayer = new JButton("Add Pooling Layer");
+		panel.add(btnAddPoolingLayer);
+		
+		JButton btnAddHiddenLayer = new JButton("Add Hidden Layer");
+		panel.add(btnAddHiddenLayer);
+		
+		JMenuBar menuBar = new JMenuBar();
+		frame.setJMenuBar(menuBar);
+		
+		JMenuItem mntmFile = new JMenuItem("File");
+		mntmFile.setHorizontalAlignment(SwingConstants.LEFT);
+		menuBar.add(mntmFile);
+		
+		JMenuItem mntmHelp = new JMenuItem("Help");
+		mntmHelp.setHorizontalAlignment(SwingConstants.LEFT);
+		menuBar.add(mntmHelp);
+	}
+
+}

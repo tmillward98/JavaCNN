@@ -1,0 +1,51 @@
+package cnn.layers;
+
+import java.util.ArrayList;
+
+import cnn.layers.neurons.Neuron;
+
+public abstract class Layer {
+
+	protected double delta = 0;
+	protected Layer nextLayer;
+	protected Layer previousLayer;
+	protected ArrayList<Neuron> neurons;
+	protected ArrayList<double[][]> input;
+	protected ArrayList<double[][]> output;
+	protected ArrayList<Double> deltas;
+	protected ArrayList<ArrayList<Double>> wtdDeltas;
+	
+	//Each layer should call the previous layer to forward propagate its results, and likewise work backs to backwards propogate the error
+	public abstract void forwardPropagate();
+	
+	public abstract void backwardPropagate(ArrayList<Double> deltas, double lr);
+	
+	public ArrayList<double[][]> getOutput(){
+		return this.output;
+	}
+	
+	public void setInput(ArrayList<double[][]> inputs) {
+		this.input = inputs;
+	}
+
+	//(yi - ti)hj where yi is the output, ti is the expected and hj is the activation of the layer 
+	//Basically, we need to find the error with respect to the derivative of the previous layers activation (this layer's input)
+	
+	//First error is derived from output - expected output
+	
+	protected ArrayList<Double> weightedDeltas(){
+		wtdDeltas = new ArrayList<ArrayList<Double>>();
+		ArrayList<Double> wtDeltas = new ArrayList<Double>();
+		
+		//For each delta
+		for(int i = 0; i < deltas.size(); i++) {
+			weightedDeltas.add(deltas.get(i) * output.get(0)[i][0] * (1 - output.get(0)[i][0]));
+		}
+		System.out.println("Finished one layer");
+		return wtDeltas;
+	}
+	
+	public abstract ArrayList<double[][]> initialiseLayer(int c, ArrayList<double[][]> exampleInput, Layer nextLayer, Layer previousLayer);
+	
+	public abstract int getCount();
+}

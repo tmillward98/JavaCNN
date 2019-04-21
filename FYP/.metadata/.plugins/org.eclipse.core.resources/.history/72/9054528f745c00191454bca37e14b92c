@@ -1,0 +1,47 @@
+package cnn.layers;
+
+import java.util.ArrayList;
+
+import cnn.layers.neurons.Neuron;
+
+public abstract class Layer {
+
+	protected double delta = 0;
+	protected Layer nextLayer;
+	protected Layer previousLayer;
+	protected ArrayList<Neuron> neurons;
+	protected ArrayList<double[][]> input;
+	protected ArrayList<double[][]> output;
+	protected ArrayList<Double> deltas;
+	
+	//Each layer should call the previous layer to forward propagate its results, and likewise work backs to backwards propogate the error
+	public abstract void forwardPropagate();
+	
+	public abstract void backwardPropagate(ArrayList<Double> deltas, double lr);
+	
+	public ArrayList<double[][]> getOutput(){
+		return this.output;
+	}
+	
+	public void setInput(ArrayList<double[][]> inputs) {
+		this.input = inputs;
+	}
+
+	protected ArrayList<Double> weightedDeltas(){
+		ArrayList<Double> wtDeltas = new ArrayList<Double>();
+		double sumDelta = 0;
+		
+		for(int i = 0; i < input.get(0).length; i++) { //For each neuron in the previous layer
+			for(int j = 0; j < neurons.size(); j++) { //Number of neurons in this layer
+				
+				sumDelta += neurons.get(j).getWeight(i) * deltas.get(j);
+			}
+			wtDeltas.add(sumDelta);
+		}
+		return wtDeltas;
+	}
+	
+	public abstract ArrayList<double[][]> initialiseLayer(int c, ArrayList<double[][]> exampleInput, Layer nextLayer, Layer previousLayer);
+	
+	public abstract int getCount();
+}

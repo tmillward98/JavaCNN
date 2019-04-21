@@ -1,0 +1,38 @@
+package cnn.gui;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+public class LayerButtons extends JFrame {
+
+	private JButton convButton, reLUButton, poolButton;
+	
+	public LayerButtons() {
+		createView();
+	}
+	
+	private void createView() {
+		JPanel panel = new JPanel();
+		getContentPane().add(panel);
+		
+		convButton = new JButton("Add Convolution Layer");
+		reLUButton = new JButton("Add ReLU Layer");
+		poolButton = new JButton("Add Pooling Layer");
+		
+		panel.add(convButton);
+		panel.add(reLUButton);
+		panel.add(poolButton);
+	}
+	
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new LayerButtons();
+			}
+		});
+	}
+	
+}

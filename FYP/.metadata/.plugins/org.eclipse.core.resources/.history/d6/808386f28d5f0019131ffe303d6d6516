@@ -1,0 +1,118 @@
+package cnn.layers;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.stream.DoubleStream;
+
+import cnn.layers.neurons.Neuron;
+import cnn.layers.neurons.SigmoidNeuron;
+
+public class FCH extends Layer{
+	protected Layer nextLayer;
+	protected Layer previousLayer;
+	private double[][] mapFlat;
+	private double[] flatInputs;
+	//private ArrayList<Neuron> neurons;
+	
+	public FCH() {
+		input = new ArrayList<double[][]>();
+		output = new ArrayList<double[][]>();
+		neurons = new ArrayList<Neuron>();
+	}
+	
+	public void forwardPropagate(){
+		output = new ArrayList<double[][]>();
+		flattenInputs();
+		
+		double[][] toOutput = new double[neurons.size()][1];
+		
+		for(int i = 0; i < neurons.size(); i++) {
+			neurons.get(i).receiveInput(flatInputs);
+			toOutput[i][0] = neurons.get(i).forward();
+		}
+		output.add(toOutput);
+		nextLayer.setInput(output);
+	}
+	
+	public void backwardPropagate(ArrayList<Double> delta, double lr) {
+		deltas = prevDelta;
+		deltas = this.weightedDeltas();
+		
+		//To update hidden layer weights (the weights connecting each neuron to the neurons in the previous layer
+		//Sum all of the deltas in this layer, and multiply that value by the weights
+		
+		for(int i = 0; i < deltas.size(); i++) {
+			delta += deltas.get(i);
+		}
+		
+		deltas.clear();
+		deltas.add(delta);
+		
+		for(int i = 0; i < neurons.size(); i++) {
+			ArrayList<Double> temp = new ArrayList<Double>();
+			temp.add(deltas.get(0));
+			neurons.get(i).updateWeights(temp, lr);
+		}
+		
+		deltas.clear();
+		
+		System.out.println("Deltas in neuron: " + neurons.get(0).getDeltas().length);
+		
+		double temp = 0;
+		for(int i = 0; i < neurons.size(); i++) {
+			for(int j = 0; j < neurons.get(i).getDeltas().length; j++) {
+				temp += neurons.get(i).getDelta(j);
+			}
+			deltas.add(temp);
+			temp = 0;
+		}
+
+		previousLayer.backwardPropagate(deltas, lr);
+		deltas.clear();
+	}
+
+	
+	public int getCount() {
+		return neurons.size();
+	}
+
+	public ArrayList<double[][]> initialiseLayer(int c, ArrayList<double[][]> exampleInput, Layer nl, Layer pl) {
+		nextLayer = nl;
+		previousLayer = pl;
+		
+		neurons = new ArrayList<Neuron>();
+		input = exampleInput;
+		
+		//Create a random number of neurons
+		createNeurons(new Random().nextInt(100), input.get(0).length);
+		
+		forwardPropagate();
+		
+		return output;
+	}
+	
+	private void createNeurons(int n, int w) {
+		for (int i = 0; i < n; i++) {
+			SigmoidNeuron a = new SigmoidNeuron(w);
+			neurons.add(a);
+		}
+	}
+
+	private void flattenInputs() {	
+		ArrayList<double[]> flatInput = new ArrayList<double[]>();
+		for(int i = 0; i < input.size(); i++) {
+			flatInput.add(Arrays.stream(input.get(i))
+			        .flatMapToDouble(Arrays::stream)
+			        .toArray());
+		}
+		flatInputs = flatInput.get(0);
+		for(int i = 1; i < flatInput.size(); i++) {
+			flatInputs = DoubleStream.concat(Arrays.stream(flatInputs), Arrays.stream(flatInput.get(i))).toArray();
+		}
+		
+		mapFlat = new double[flatInputs.length][1];
+		
+	}
+
+}

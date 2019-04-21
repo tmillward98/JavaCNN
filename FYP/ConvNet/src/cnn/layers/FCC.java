@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.DoubleStream;
 
+import org.xml.sax.InputSource;
+
 import cnn.layers.neurons.*;
 
 public class FCC extends Layer {
@@ -12,26 +14,70 @@ public class FCC extends Layer {
 	protected Layer previousLayer;
 	private double[][] mapFlat;
 	private double[] flatInputs;
-	//private ArrayList<double[][]> input;
-	//private ArrayList<double[][]> output;
-	private ArrayList<Neuron> neurons;
+	//private ArrayList<Neuron> neurons;
 	
 	public void forwardPropagate(){
 		output = new ArrayList<double[][]>();
 		flattenInputs();
 		
+		double sum = 0;
+		
 		for(int i = 0; i < neurons.size(); i++) {
 			neurons.get(i).receiveInput(flatInputs);
 			mapFlat[i][0] = neurons.get(i).forward();
+			sum+= mapFlat[i][0];
 		}
+		
+		for(int i = 0; i < mapFlat.length; i++) {
+			mapFlat[i][0] = mapFlat[i][0] / sum;
+		}
+		
 		output.add(mapFlat);
 	}
 	
-	public void backwardPropagate(double delta, double lr) {
-		System.out.println("Reached class layer");
-		for(Neuron n : neurons)
-			n.updateWeights(delta, lr);
-		previousLayer.backwardPropagate(delta, lr);
+	//At this layer, we already receive the deltas for updating the weights
+	public void backwardPropagate(ArrayList<Double> prevDelta, double lr) {
+		
+		//As this is the output layer, the error is already calculated. 
+		//As such, delta is calculated as error * transfer derivative (one delta per neuron)
+		
+		
+		//We receive the error for this layer (expected - actual)
+		deltas = prevDelta;
+		
+		//And so our delta for this layer is the error * derivative
+		//Smax derivative = smax(xi) * (1-smax(xi))
+		for(int i = 0; i < neurons.size(); i++) {
+			deltas.set(i, deltas.get(i) * output.get(0)[i][0]);
+		}
+		
+		//Before updating the weights, the deltas for the previous layer need to be calculated
+		//Hence, determine the error
+		//error = sum of all weight[i] in each neuron * the given neurons delta (j)
+		//ALL THE WEIGHTS IN THE NEURON ARE THE WEIGHTS THAT CONNECT CURRENT NEURON TO THE PREVIOUS NEURON
+		
+		//Error is equal to (weight_k * error_j) * transfer_derivative
+		//Derivative is applied within the layer itself
+		
+		//For each neuron's output in the previous layer
+		//For each neuron in the current layer
+		ArrayList<Double> errors = new ArrayList<Double>();
+		
+		for(int i = 0; i < flatInputs.length; i++) {
+			double error = 0.0;
+			for(int j = 0; j < neurons.size(); j++) {		
+				error += neurons.get(j).getWeight(i) * deltas.get(j);
+			}
+			errors.add(error);
+		}
+		
+		previousLayer.backwardPropagate(errors, lr);
+	
+		
+		for(int i = 0; i < neurons.size(); i++) {
+			neurons.get(i).updateWeights(deltas.get(i), lr);
+		}
+		
 	}
 
 	public ArrayList<double[][]> initialiseLayer(int c, ArrayList<double[][]> exampleInput, Layer nl, Layer pl) {

@@ -1,0 +1,144 @@
+package cnn;
+
+import javax.swing.*;
+
+import javafx.application.Application;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+public class GUI extends JFrame {
+	
+	//Network Variables
+	static ArrayList<CNN> networks;
+	static ArrayList<Integer> NetworkStructure;
+	static ArrayList<Integer> FCStructure;
+	float lr; int epochs; int c;
+	
+	private JButton convButton, reLUButton, poolButton;
+	private JTextArea textArea;
+	
+	public GUI() {
+		NetworkStructure = new ArrayList<Integer>();
+		FCStructure = new ArrayList<Integer>();
+		
+		setSize(800,800);
+		createView();	
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
+		setResizable(false);
+
+	}
+	
+	private void createView() {
+		JPanel panel = new JPanel();
+		getContentPane().add(panel);
+		
+		textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setLineWrap(true);
+		textArea.setWrapStyleWord(true);
+		textArea.setPreferredSize(new Dimension(800,400));
+		
+		convButton = new JButton("Add Convolution Layer");
+		convButton.addActionListener(new ConvButtonActionListener());
+		
+		reLUButton = new JButton("Add ReLU Layer");
+		reLUButton.addActionListener(new ReLUButtonActionListener());
+		
+		poolButton = new JButton("Add Pooling Layer");
+		poolButton.addActionListener(new PoolButtonActionListener());
+		
+		panel.add(textArea);
+		panel.add(convButton);
+		panel.add(reLUButton);
+		panel.add(poolButton);
+
+
+	}
+	
+	private void addConv() {
+		NetworkStructure.add(1);
+	}
+	
+	private void addReLU() {
+		NetworkStructure.add(2);
+	}
+	
+	private void addPool() {
+		NetworkStructure.add(3);
+	}
+	
+	//Called whenever a layer is added to update GUI
+	private void updateView() {
+		
+		textArea.setText("");
+		textArea.append("Input ->");
+		
+		for(int n : NetworkStructure) {
+			switch(n) {
+			
+			case 1:
+				textArea.append("Conv ->");
+				break;
+			
+			case 2:
+				textArea.append("Relu ->");
+				break;
+			
+			case 3:
+				textArea.append("Pool ->");
+				break;
+			
+			}
+		}
+		
+		textArea.append("FC Input ->");
+		
+		
+		for(int n : FCStructure) {
+			textArea.append("Hidden Layer ->");
+		}
+		
+		textArea.append("Output Layer");
+	}
+	
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new GUI().setVisible(true);
+			}
+		});
+	}
+	
+	private class ConvButtonActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			addConv();
+			updateView();
+		}
+	}
+	
+	private class ReLUButtonActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			addReLU();
+			updateView();
+		}
+	}
+	
+	private class PoolButtonActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			addPool();
+			updateView();
+		}
+	}
+	
+}

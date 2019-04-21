@@ -13,9 +13,7 @@ public class FCH extends Layer{
 	protected Layer previousLayer;
 	private double[][] mapFlat;
 	private double[] flatInputs;
-	private ArrayList<double[][]> input;
-	private ArrayList<double[][]> output;
-	private ArrayList<Neuron> neurons;
+	//private ArrayList<Neuron> neurons;
 	
 	public FCH() {
 		input = new ArrayList<double[][]>();
@@ -27,20 +25,44 @@ public class FCH extends Layer{
 		output = new ArrayList<double[][]>();
 		flattenInputs();
 		
+		double[][] toOutput = new double[neurons.size()][1];
+		
 		for(int i = 0; i < neurons.size(); i++) {
 			neurons.get(i).receiveInput(flatInputs);
-			mapFlat[i][0] = neurons.get(i).forward();
+			toOutput[i][0] = neurons.get(i).forward();
 		}
-		output.add(mapFlat);
+		
+		output.add(toOutput);
 		nextLayer.setInput(output);
 	}
 	
-	public void backwardPropagate(double delta, double lr) {
-		System.out.println("Reached hidden layer");
-		for(Neuron n : neurons)
-			n.updateWeights(delta, lr);
-		previousLayer.backwardPropagate(delta, lr);
+	public void backwardPropagate(ArrayList<Double> prevDelta, double lr) {
+		deltas = prevDelta;
+		
+		for(int i = 0; i < neurons.size(); i++) {
+			deltas.set(i, deltas.get(i) * neurons.get(i).getDerivative());
+		}
+		
+		ArrayList<Double> errors = new ArrayList<Double>();
+		
+		for(int i = 0; i < neurons.get(0).getWeights().length; i++) {
+			double error = 0;
+			for(int j = 0; j < neurons.size(); j++) {
+				error += neurons.get(j).getWeight(i) * deltas.get(j);
+			}
+			errors.add(error);
+			error = 0;
+		}
+		
+		for(int i = 0; i < neurons.size(); i++) {
+			neurons.get(i).updateWeights(deltas.get(i), lr);
+		}
+		
+		previousLayer.backwardPropagate(errors, lr);
+		
+		
 	}
+
 	
 	public int getCount() {
 		return neurons.size();
@@ -56,7 +78,9 @@ public class FCH extends Layer{
 		//Create a random number of neurons
 		createNeurons(new Random().nextInt(100), input.get(0).length);
 		
-		return input;
+		forwardPropagate();
+		
+		return output;
 	}
 	
 	private void createNeurons(int n, int w) {

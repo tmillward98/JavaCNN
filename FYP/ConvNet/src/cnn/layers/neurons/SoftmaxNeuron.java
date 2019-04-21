@@ -1,0 +1,72 @@
+package cnn.layers.neurons;
+
+import java.util.ArrayList;
+
+public class SoftmaxNeuron extends Neuron {
+
+	int vectorLength;
+	String label;
+	//public double[] input;
+	double[] output;
+	//double[] weights;
+	double rc = 0;
+	double b1 = 1;
+	
+	/**
+	 * Class neuron which produces a score output that said image belongs to a class
+	 * @param l - class label
+	 * @param exampleInput - Denotes how long the vector of weights should be 
+	 */
+	public SoftmaxNeuron(int n) {
+		weights = new double[n];
+		changeInWeights = new double[n];
+		for (int i = 0; i < weights.length; i++) {
+			weights[i] = 0.01;
+			changeInWeights[i] = 0;
+		}
+	}
+	
+	public void receiveInput(double inputs) {
+		System.out.println("Error, should receive multiple inputs at class layer.");
+	}
+	
+	public void receiveInput(double[] inputs) {
+		input = inputs;
+	}
+
+	public void updateWeights(double delta, double lr) {
+		for(int i = 0; i < weights.length; i++) {
+			changeInWeights[i] = input[i] * delta * lr;
+			//System.out.print("Change: " + changeInWeights[i] + "|");
+			//System.out.print("Old weight value: " + weights[i] + "|");
+			weights[i] = weights[i] + changeInWeights[i];
+			//System.out.println("New weight value: " + weights[i]);
+		}
+	}
+	
+	
+	public double forward() {
+		rc = 0;
+		softmax();
+		return rc;
+	}
+	
+	public double getDerivative() {
+		return rc * (1.0 - rc);
+	}
+
+	
+	private void softmax() {
+		for(int i = 0; i < input.length; i++) {
+			input[i] = input[i] * weights[i];
+			rc += input[i];
+		}
+		rc += b1;
+		
+		rc = Math.exp(rc);
+	}
+	
+	
+}
+
+

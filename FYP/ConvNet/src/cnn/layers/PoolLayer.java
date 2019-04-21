@@ -6,8 +6,8 @@ public class PoolLayer extends Layer{
 	
 	Layer previousLayer;
 	Layer nextLayer;
-	ArrayList<double[][]> input;
-	ArrayList<double[][]> output;
+	//ArrayList<double[][]> input;
+	//ArrayList<double[][]> output;
 	
 	private int poolD;
 	private int stride;
@@ -30,8 +30,7 @@ public class PoolLayer extends Layer{
 		return output;
 	}
 	
-	public void backwardPropagate(double delta, double lr) {
-		System.out.println("Reached pool layer");
+	public void backwardPropagate(ArrayList<Double> delta, double lr) {
 		previousLayer.backwardPropagate(delta, lr);
 	}
 	

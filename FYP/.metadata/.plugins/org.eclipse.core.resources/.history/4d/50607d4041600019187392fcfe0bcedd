@@ -1,0 +1,76 @@
+package cnn.layers;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.stream.DoubleStream;
+
+import cnn.layers.neurons.Neuron;
+import cnn.layers.neurons.SoftmaxNeuron;
+
+public class SoftmaxLayer extends Layer{
+
+	protected Layer nextLayer;
+	protected Layer previousLayer;
+	private double[][] mapFlat;
+	private double[] flatInputs;
+	private double sum = 0;
+	
+	
+	
+	public SoftmaxLayer() {
+		input = new ArrayList<double[][]>();
+		output = new ArrayList<double[][]>();
+		neurons = new ArrayList<Neuron>();
+	}
+	
+	public void forwardPropagate(){
+		output = new ArrayList<double[][]>();
+		flattenInputs();
+		
+		double[][] toOutput = new double[neurons.size()][1];
+		
+		for(int i = 0; i < neurons.size(); i++) {
+			neurons.get(i).receiveInput(flatInputs);
+			toOutput[i][0] = neurons.get(i).forward();
+			sum += neurons.get(i).forward();
+		}
+		
+		for(int i = 0; i < toOutput.length; i++) {
+			toOutput[i][0] = toOutput[i][0] / sum;
+		}
+		
+		sum = 0;
+		
+		output.add(toOutput);
+		nextLayer.setInput(output);
+	}
+	
+	public void backwardPropagate(ArrayList<Double> delta, double lr) {
+	}
+	
+	private void createNeurons(int n, int w) {
+		for (int i = 0; i < n; i++) {
+			SoftmaxNeuron a = new SoftmaxNeuron(w);
+			neurons.add(a);
+		}
+	}
+
+	private void flattenInputs() {	
+		ArrayList<double[]> flatInput = new ArrayList<double[]>();
+		for(int i = 0; i < input.size(); i++) {
+			flatInput.add(Arrays.stream(input.get(i))
+			        .flatMapToDouble(Arrays::stream)
+			        .toArray());
+		}
+		flatInputs = flatInput.get(0);
+		for(int i = 1; i < flatInput.size(); i++) {
+			flatInputs = DoubleStream.concat(Arrays.stream(flatInputs), Arrays.stream(flatInput.get(i))).toArray();
+		}
+		
+		mapFlat = new double[flatInputs.length][1];
+		
+	}
+
+	
+}
