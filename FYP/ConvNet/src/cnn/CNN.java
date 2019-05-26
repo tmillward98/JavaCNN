@@ -19,7 +19,7 @@ import javafx.util.Pair;
 
 public class CNN {
 
-	private float learningRate;
+	private double learningRate;
 	private int epochs;
 	private int classes;
 	
@@ -30,10 +30,11 @@ public class CNN {
 	
 	private double rc = 0;
 	private double networkCost = 0;
+	private String validResults = "";
 	
 	private String[] directories;
 	
-	
+	private ArrayList<Double> costs;
 	private ArrayList<Double> errors;	
 	private ArrayList<double[]> expectedOutputs;
 	private ArrayList<Pair<String, Integer>> trainingBatch;
@@ -52,7 +53,7 @@ public class CNN {
 	 * @param classFile - class labels
 	 * @param structure - int structure
 	 */
-	CNN(float lr, int e, int c, String directory, String classFile, int[] structure){
+	CNN(double lr, int e, int c, String directory, String classFile, int[] structure){
 		output = new ArrayList<double[][]>();
 		learningRate = lr;
 		epochs = e;
@@ -64,6 +65,7 @@ public class CNN {
 		createNetwork(structure);
 		initialiseNetwork(c, loadImage(trainingSet.get(0).getKey()));
 		
+		costs = new ArrayList<Double>();
 		deltas = new ArrayList<Double>();
 
 		for(int i = 0; i < c; i++) {
@@ -90,33 +92,28 @@ public class CNN {
 		
 		currentImage.add(convertImage(a));
 		
+		//DISABLED FOR DEMO
+		//for(int i = 0; i < epochs; i++) {
+			
+		//}
 		
-		for(int i = 0; i < epochs; i++) {
-			
-			System.out.println("EPOCH:" + i);
-			
-			createBatch(trainingSet.size() / 5);
-			
-			
-			for(int j = 0; j < trainingBatch.size(); j++) {
+		createBatch(8);	
+		for(int j = 0; j < trainingBatch.size(); j++) {
+			try {
+				a = ImageIO.read(new File(trainingBatch.get(j).getKey()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 				
-				try {
-					a = ImageIO.read(new File(trainingBatch.get(j).getKey()));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			currentImage.set(0, convertImage(a));
+			layers.get(0).setInput(currentImage);
 				
-				currentImage.set(0, convertImage(a));
-				layers.get(0).setInput(currentImage);
+			for(Layer l : layers) {
+				l.forwardPropagate();
+			}	
 				
-				for(Layer l : layers) {
-					l.forwardPropagate();
-				}	
-				
-				output.clear();
-				
-				//output.equals(layers.get(layers.size()-1).getOutput());
-				output = layers.get(layers.size()-1).getOutput();
+			output.clear();
+			output = layers.get(layers.size()-1).getOutput();
 				
 				/**
 				System.out.print("Output: ");
@@ -126,36 +123,31 @@ public class CNN {
 				System.out.println("Class: " + trainingBatch.get(j).getValue().intValue());
 				**/
 				
-				ArrayList<Double> tempDeltas = new ArrayList<Double>();
+			ArrayList<Double> tempDeltas = new ArrayList<Double>();
 				
-				tempDeltas = this.calcError(layers.get(layers.size()-1).getOutput(), expectedOutputs.get(trainingBatch.get(j).getValue().intValue()));
+			tempDeltas = this.calcError(layers.get(layers.size()-1).getOutput(), expectedOutputs.get(trainingBatch.get(j).getValue().intValue()));
 				
-				layers.get(layers.size()-1).backwardPropagate(tempDeltas, learningRate);
+			layers.get(layers.size()-1).backwardPropagate(tempDeltas, learningRate);
 				
-				for(int x = 0; x < deltas.size(); x++) {
-					deltas.set(x, deltas.get(x) + tempDeltas.get(x));
-					//System.out.println(deltas.get(x));
-				}
-				
-				
-				
-				
-			}
-			
-			//Average batch
-			for(int j = 0; j < deltas.size(); j++) {
-				deltas.set(j, deltas.get(j) / trainingBatch.size());
-				}
-			
-			//layers.get(layers.size()-1).backwardPropagate(deltas, learningRate);
-			
-			deltas.clear();
-			
-			for(int j = 0; j < classes; j++) {
-				deltas.add(0.0);
-			}
-			System.out.println("Cost: " + networkCost);
+			for(int x = 0; x < deltas.size(); x++) {
+				deltas.set(x, deltas.get(x) + tempDeltas.get(x));
+			}	
 		}
+			
+		deltas.clear();
+			
+		for(int j = 0; j < classes; j++) {
+			deltas.add(0.0);
+		}
+			
+		networkCost = 0;
+			
+		for(double n : costs)
+			networkCost += n;
+			
+		networkCost = networkCost/costs.size();
+		costs.clear();
+		System.out.println("Average cost: " + networkCost);
 	}
 	
 	/**
@@ -177,7 +169,7 @@ public class CNN {
 		ArrayList<double[][]> currentImage = new ArrayList<double[][]>();
 		
 		currentImage.add(convertImage(a));
-		
+		validResults = "";
 		
 		for(int i = 0; i < validationSet.size(); i++) {
 			
@@ -220,6 +212,8 @@ public class CNN {
 				}
 			}
 			
+			
+			validResults += ("Actual Class: " + validationSet.get(i).getValue().intValue() + " Predicted class: " + currentIndex + "\n");
 			System.out.print("Actual Class: " + validationSet.get(i).getValue().intValue());
 			System.out.println(" Predicted class: " + currentIndex);
 			
@@ -231,9 +225,11 @@ public class CNN {
 		}
 		if(correctGuesses != 0) {
 			double percentage = ((double)correctGuesses / (double)validationSet.size()) * 100;
+			validResults += ("Correct percentage: " + percentage);
 			System.out.println("Network is " + percentage + "% correct when predicting using validation set.");
 		}
 		else {
+			validResults += ("Failed all tests.");
 			System.out.println("Failed all tests.");
 		}
 
@@ -348,6 +344,12 @@ public class CNN {
 	
 	//H(p,q) = -sigma p(x) log q(x)
 	public static double crossEntropy(double p, double q) {
+		
+		if(p == 0)
+			p = 0.01;
+		if(q == 0)
+			q = 0.01;
+		
 		return (p * Math.log(q));
 	}
 
@@ -405,8 +407,7 @@ public class CNN {
 	    		while(true) {
 		    		if(trainingSet.get(randomInt).getValue().intValue() == validationSet.get(i - 1).getValue().intValue()) {
 		    			//System.out.println("Repeat value: " + trainingSet.get(randomInt).getValue().intValue()  + " | " + validationSet.get(i - 1).getValue().intValue());
-		    			randomInt = (int) Math.random() * trainingSet.size() - 1;
-		    			
+		    			randomInt = (int) Math.round(Math.random() * trainingSet.size() - 1);
 		    			if(randomInt == -1) {
 		    				randomInt = 0;
 		    			}
@@ -469,6 +470,7 @@ public class CNN {
 		currentMax = output.get(0)[0][0];
 		
 		for(int i = 0; i < output.get(0).length; i++) {
+			System.out.println("Current max: " + currentMax + " Testing max: " + output.get(0)[i][0]);
 			if(output.get(0)[i][0] > currentMax) {
 				currentMax = output.get(0)[i][0]; currentIndex = i;
 			}
@@ -494,17 +496,27 @@ public class CNN {
 			
 		networkCost = -networkCost;
 		
+		costs.add(networkCost);
+		
 		//errors.add(networkCost);
 		//System.out.println("Cost: " + networkCost);
 		
 		return errors;
 	}
 	
+	public double getCost() {
+		return networkCost;
+	}
+	
+	public String getValid() {
+		return validResults;
+	}
+	
 	public static void main(String[] args) {
 		
 		int[] newS = {0, 1, 2, 3, 5};
 		
-		CNN a = new CNN((float)0.05, 750, 10, "E:\\University\\Year 3\\Final Year Project\\Dataset\\SmallDemoTrainingSet", "E:\\University\\Year 3\\Final Year Project\\Dataset\\SmallDemoTrainingSet\\class.txt", newS);
+		CNN a = new CNN(0.05, 600, 10, "E:\\University\\Year 3\\Final Year Project\\Dataset\\SmallDemoTrainingSet", "E:\\University\\Year 3\\Final Year Project\\Dataset\\SmallDemoTrainingSet\\class.txt", newS);
 		
 		a.trainNetwork();
 		a.validateNetwork();

@@ -9,7 +9,7 @@ public class ReLUNeuron extends Neuron {
 		changeInWeights = new double[weights.length];
 		for(int i = 0; i < weights.length; i++) {
 			changeInWeights[i] = 0;
-			weights[i] = Math.random() * 0.01;
+			weights[i] = Math.random() * 0.001;
 		}
 	}
 	
@@ -24,10 +24,7 @@ public class ReLUNeuron extends Neuron {
 	public void updateWeights(double delta, double lr) {
 		for(int i = 0; i < weights.length; i++) {
 			changeInWeights[i] = input[i] * delta * lr;
-			//System.out.print("Change: " + changeInWeights[i] + "|");
-			//System.out.print("Old weight value: " + weights[i] + "|");
 			weights[i] = weights[i] + changeInWeights[i];
-			//System.out.println("New weight value: " + weights[i]);
 		}
 	}
 	

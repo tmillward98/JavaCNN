@@ -15,12 +15,19 @@ public class HiddenReLU extends Layer{
 	private double[][] mapFlat;
 	private double[] flatInputs;
 	
+	/**
+	 * ReLU Layer Constructor
+	 * Initialise ArrayLists
+	 */
 	public HiddenReLU() {
 		input = new ArrayList<double[][]>();
 		output = new ArrayList<double[][]>();
 		neurons = new ArrayList<Neuron>();
 	}
 	
+	/**
+	 * Perform neuron wise operations
+	 */
 	public void forwardPropagate(){
 		output = new ArrayList<double[][]>();
 		flattenInputs();
@@ -64,7 +71,6 @@ public class HiddenReLU extends Layer{
 			neurons.get(i).updateWeights(deltas.get(i), lr);
 		}
 	}
-
 	
 	public int getCount() {
 		return neurons.size();

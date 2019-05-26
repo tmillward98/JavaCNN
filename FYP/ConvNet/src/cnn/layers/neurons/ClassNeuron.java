@@ -10,7 +10,7 @@ public class ClassNeuron extends Neuron {
 	double[] output;
 	//double[] weights;
 	double rc = 0;
-	double b1 = 0;
+	double b1 = 1;
 	
 	/**
 	 * Class neuron which produces a score output that said image belongs to a class

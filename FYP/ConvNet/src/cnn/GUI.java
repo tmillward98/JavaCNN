@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class GUI extends JFrame {
 	
@@ -18,7 +19,11 @@ public class GUI extends JFrame {
 	static ArrayList<CNN> networks;
 	static ArrayList<Integer> NetworkStructure;
 	static ArrayList<Integer> FCStructure;
-	float lr; int epochs; int c;
+	static ArrayList<int[]> generations;
+	float lr;
+	int epochs, c;
+	int gens;
+	int steps;
 	
 	private JMenuBar menu;
 	private JMenu file, help;
@@ -171,6 +176,94 @@ public class GUI extends JFrame {
 			addHidden();
 			updateView();
 		}
+	}
+	
+	/**
+	 * Optimisation Section 
+	 * Create a generation of network, with a randomly implemented change from a list of possible changes
+	 * Eg. extra conv->relu, extra hidden layer
+	 * Keep the best generation (lowest cost)
+	 */
+	private void createGenerations() {
+		
+		if (gens > 5) {
+			gens = 5;
+		}
+		
+		if(gens != 5) {
+			Random rand = new Random();
+			
+			int num = 0;
+			int previousNum = 0;
+			
+			for(int i = 0; i < gens; i++) {
+				
+				if(i != 0) {
+					previousNum = num; 
+					num = rand.nextInt(10);
+					while(num == previousNum) {
+						num = rand.nextInt(10);
+					}
+				}
+				else {
+					num = rand.nextInt(5);
+				}
+			}
+
+			
+			switch(num) {
+			
+			case 0:
+				NetworkStructure.add(1);
+				NetworkStructure.add(2);
+				break;
+				
+			case 1:
+				NetworkStructure.add(3);
+				break;
+				
+			case 2:
+				NetworkStructure.add(1);
+				NetworkStructure.add(2);
+				NetworkStructure.add(3);
+				break;
+				
+			case 3:
+				FCStructure.add(4);
+				break;
+			case 4:
+				FCStructure.add(4);
+				FCStructure.add(4);
+				break;
+				
+			case 5:
+				NetworkStructure.add(1);
+				NetworkStructure.add(2);
+				FCStructure.add(4);
+			
+			}
+		}
+		
+		//Create networks with all possible options
+		else {
+			
+		}
+		
+		for(int i = 0; i < networks.size(); i++) {
+			networks.get(i).trainNetwork();
+		}
+		
+		int currentIndex = 0;
+		CNN a = networks.get(0);
+		
+		//Finally, only keep network with highest cost
+		for(int i = 1; i < networks.size(); i++) {
+			if(networks.get(i).getCost() < a.getCost()) {
+				currentIndex = i;
+				a = networks.get(i);
+			}
+		}
+		
 	}
 	
 }

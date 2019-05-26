@@ -24,6 +24,7 @@ public class FCI extends Layer {
 	public void forwardPropagate(){
 		
 		flattenInputs();
+		//normaliseData();
 		input.clear();
 		
 		output = new ArrayList<double[][]>();
@@ -69,6 +70,25 @@ public class FCI extends Layer {
 		previousLayer.backwardPropagate(deltas, lr);
 	}
 
+	private void normaliseData() {
+		double min = flatInputs[0];
+		double max = flatInputs[0];
+		
+		for(double i : flatInputs) {
+			if(i < min) {
+				min = i;
+			}
+			else if(i > max) {
+				max = i;
+			}
+		}
+		
+		for(int i = 0; i < flatInputs.length; i++) {
+			flatInputs[i] = (flatInputs[i] - min) *(255/(max - min));
+		}
+		
+		
+	}
 	
 	private void flattenInputs() {	
 		ArrayList<double[]> flatInput = new ArrayList<double[]>();

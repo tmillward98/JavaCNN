@@ -17,8 +17,6 @@ public class ConvolutionLayer extends Layer {
 	private int conD;
 	private int stride;
 	private int k;
-	//protected ArrayList<double[][]> input;
-	//protected ArrayList<double[][]> output;
 	private ArrayList<ConvNeuron> neurons;
 	
 	public int getCount() {
@@ -53,7 +51,6 @@ public class ConvolutionLayer extends Layer {
 	 * Hard-coded values for stride and conD (3x3 matrix with stride 1) with k feature kernels
 	 */
 	public ConvolutionLayer(){
-		//input = new ArrayList<double[][]>();
 		output = new ArrayList<double[][]>();
 		neurons = new ArrayList<ConvNeuron>();
 		conD = 3;

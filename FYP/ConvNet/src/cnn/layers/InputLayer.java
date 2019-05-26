@@ -70,7 +70,7 @@ public class InputLayer extends Layer {
 	    		e.printStackTrace();
 	    	}
 	    }
-		
+	    
 		
 		//Convert images to pixel array
 		double[][] temp = new double[loadedImages.get(0).getWidth()][loadedImages.get(0).getHeight()];
